@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap 101 Template</title>
+
+  <!-- Bootstrap -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/dashboard.css" rel="stylesheet">
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+
+
+
+  <![endif]-->
+</head>
+
+
+<body>
+<script src="http://www.google.com/jsapi"></script>
+
+
+<script src="js/chartkick.js"></script>
+
+
+
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      <button data-target=".navbar-collapse" data-toggle="collapse" class="navbar-toggle" type="button">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="#" class="navbar-brand">QA Works Dashboard Prototype</a>
+    </div>
+
+
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#">Dashboard</a></li>
+        <li><a href="#">Settings</a></li>
+        <li><a href="#">Profile</a></li>
+        <li><a href="#">Help</a></li>
+      </ul>
+      <form class="navbar-form navbar-right">
+        <input type="text" placeholder="Search..." class="form-control">
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-3 col-md-2 sidebar">
+      <ul class="nav nav-sidebar">
+        <li class="active"><a href="#">Overview</a></li>
+        <li><a href="?job=iOS_7_Ipad_Sanity&results=ios-ipad-sanity">iOS7 - Sanity Report</a></li>
+        <li><a href="?job=iOS_7_Ipad_Regression_build_nightly&results=report">iOS7- Full Regression Report</a></li>
+        <li><a href="?job=Google_Nexus_7_Regressions_Sim&results=report">Google Nexus 7 - Full Regression Report</a></li>=
+        <li><a href="?job=Sun%20-%20Firefox%20Tests%20-%20Regression&results=report">Sun Web Team</a></li>
+      </ul>
+
+   <!--   <ul class="nav nav-sidebar">
+        <li><a href="">Nav item</a></li>
+        <li><a href="">Nav item again</a></li>
+        <li><a href="">One more nav</a></li>
+        <li><a href="">Another nav item</a></li>
+        <li><a href="">More navigation</a></li>
+      </ul>
+      <ul class="nav nav-sidebar">
+        <li><a href="">Nav item again</a></li>
+        <li><a href="">One more nav</a></li>
+        <li><a href="">Another nav item</a></li>
+      </ul> -->
+    </div>
+
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+      <h1 class="page-header">Dashboard</h1>
+
+      <div class="row placeholders">
+        <div class="col-md-4 col-sm-3 placeholder">
+          <%= pie_chart [["Pass", @results[:passed].count], ["Fail", @results[:failed].count]], colors: ["green", "red"] %>
+          <h4>Results</h4>
+          <span class="text-muted">Latest Build Results</span>
+        </div>
+        <div class="col-md-4 col-sm-3 placeholder">
+          <%= column_chart @graph_data, colors: ["blue"] %>
+          <h4>Total Scenarios</h4>
+          <span class="text-muted">Total Scenarios in Test Run</span>
+        </div>
+        <div class="col-md-4 col-sm-3 placeholder">
+          <%= bar_chart [["Total Acceptance Tests", 60], ["Number Automated", 30]], colors: ["purple"] %>
+          <h4>Total Scenarios / Automated Scenarios</h4>
+          <span class="text-muted">Something else</span>
+        </div>
+      </div>
+
+      <h2 class="sub-header">Test Team</h2>
+
+
+      <h4>Ana De Wiele</h4>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th>#</th>
+            <th>Git User</th>
+            <th>Email</th>
+            <th>Git Commit Message</th>
+            <th>TimeStamp</th>
+          </tr>
+          </thead>
+          <tbody>
+          <% @git.get_last_three_commits_by_user('ana-qaworks').each do |commit| %>
+              <tr>
+                <td></td>
+                <td><%= commit.commit.author.name %></td>
+                <td><%= commit.commit.author.email %></td>
+                <td><%= commit.commit.message %></td>
+                <td><%= commit.commit.author.date %></td>
+          <% end %>
+          </tbody>
+        </table>
+        </div>
+
+
+        <h4>Adam Griffith</h4>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th>#</th>
+              <th>Git User</th>
+              <th>Email</th>
+              <th>Git Commit Message</th>
+              <th>TimeStamp</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% @git.get_last_three_commits_by_user('testerindevelopment').each do |commit| %>
+              <tr>
+               <td></td>
+                <td><%= commit.commit.author.name %></td>
+                <td><%= commit.commit.author.email %></td>
+                <td><%= commit.commit.message %></td>
+                <td><%= commit.commit.author.date %></td>
+            <% end %>
+            </tbody>
+          </table>
+          </div>
+
+
+
+      </div>
+    </div>
+
+
+
+</div>
+
+
+<!-- jjQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="js/chartkick.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+
+</body>
+
+
+</html>

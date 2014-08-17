@@ -1,0 +1,8 @@
+development:
+  sessions:
+    default:
+      database: development
+      hosts:
+        - localhost:27017
+      options:
+        consistency: strong

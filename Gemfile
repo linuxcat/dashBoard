@@ -1,0 +1,13 @@
+source 'https://rubygems.org'
+
+gem 'sinatra'
+gem 'sinatra-contrib'
+gem 'mongo'
+gem 'mongoid', '~> 3.1.6'
+gem 'shotgun'
+gem 'chartkick'
+gem 'groupdate'
+gem 'jenkins_api_client', '~> 1.0.0'
+gem 'octokit', '~> 3.0'
+gem 'pry'
+gem 'rails'
