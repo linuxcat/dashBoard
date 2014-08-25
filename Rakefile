@@ -25,34 +25,29 @@ task :load_json_results_file_from_jenkins_app_team, [:job,:file] do |t, args|
 end
 
 
-desc 'load jenkins feature file json report for the webteam'
-task :load_json_results_file_from_jenkins_web_team, [:job,:path,:file] do |t, args|
-  @jenkins = Jenkins.new('10.198.10.3','ni_test', 'ni_test')
-  results = @jenkins.send(:get_latest_json_results_wt,args[:job], args[:path], args[:file])
-  project_run = []
-  results.each do |feature|
-    feature['elements'].each do |scenario|
-      project_run << scenario
+#rake load_jenkins_data["Sun - Firefox Tests - Regression","/ws/sol-automation/sun-online/src/test/resources/report/"]
+desc 'load web team test run into app'
+task :load_jenkins_data, [:job, :path] do |t, args|
+  files = {'DryRun' => 'dry_run.json', 'TestRun' => 'report.json'}
+  files.each do |key, value|
+    @jenkins = Jenkins.new('10.198.10.3','ni_test', 'ni_test')
+    results = @jenkins.send(:get_latest_json_results_wt,args[:job], args[:path], value)
+    project_run = []
+    results.each do |feature|
+      feature['elements'].each do |scenario|
+        project_run << scenario
+      end
     end
-  end
-  test_run = TestRun.new(:job => args[:job], :scenarios => project_run)
-  test_run.save
- #/job/Sun - IE Tests - Regression/ws/sol-automation/sun-online/src/test/resources/report/
-end
+    class_name = Object.const_get(key, Class.new)
+    test_run = class_name.new(:job => args[:job], :scenarios => project_run)
+    test_run.save
 
-desc 'load jenkins dry run report'
-task :load_json_dry_run_results_file_from_jenkins_web_team, [:job,:path] do |t, args|
-  @jenkins = Jenkins.new('10.198.10.3','ni_test', 'ni_test')
-  results = @jenkins.send(:get_latest_json_results_wt,args[:job], args[:path], "dry_run.json")
-  project_run = []
-  results.each do |feature|
-    feature['elements'].each do |scenario|
-      project_run << scenario
-    end
+
   end
-  test_run = DryRun.new(:job => args[:job], :scenarios => project_run)
-  test_run.save
-  #/job/Sun - IE Tests - Regression/ws/sol-automation/sun-online/src/test/resources/report/
+  grouped = TestRun.group_failed_scenarios(args[:job])
+  failure = TestRunFailure.new(:failed => grouped, :test_run => args[:job] )
+  failure.save!
+
 end
 
 

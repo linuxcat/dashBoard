@@ -1,4 +1,3 @@
-
 class TestRun
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -6,6 +5,28 @@ class TestRun
   field :job, type: String
   field :scenarios, type: Array
 
+  def self.group_failed_scenarios(job)
+    self.collection.aggregate(
+        {'$unwind' => '$scenarios'},
+        {'$match' => {job: job, 'scenarios.steps.result.status' => 'failed'}},
+        {'$group' => {_id: {feature: "$scenarios.name", step: "$scenarios.steps"}}}
+    )
+  end
+
+  def self.group_by_status(job)
+    self.collection.aggregate(
+        { '$match' => {job: job}},
+        { '$sort' => {created_at: -1}},
+        { '$limit' => 1},
+        { '$unwind' => "$scenarios"},
+        { '$project' => {"scenarios.steps.result.status" => 1, "_id" => 0}},
+        { '$unwind' => "$scenarios.steps"},
+        { '$group' => {_id: {status: "$scenarios.steps.result.status"}, count: {'$sum' => 1}}},
+        { '$sort' => {count: 1}}
+
+    )
+
+  end
 
 
   def self.group_by(field, format = 'day')
@@ -21,6 +42,9 @@ class TestRun
     collection.aggregate(pipeline)
   end
 
+
+
+
 end
 
 
@@ -31,6 +55,14 @@ class DryRun
   field :job, type: String
   field :scenarios, type: Array
 
+  def self.return_latest_dry_run(job)
+    self.collection.aggregate(
+        {'$match' => {job: job}},
+        { '$sort' => {created_at: -1}},
+        { '$limit' => 1}
+    )
+
+  end
 
 
 end
@@ -43,11 +75,15 @@ class TestRunFailure
   field :failure, type: Array
 
   def self.grouped_failures(job)
+    puts "in ground for #{job}"
     grouped = self.collection.aggregate(
         {'$unwind' => '$failed'},
         {'$match' => {test_run: job}},
-        {'$group' => {_id: { failure: "$failed._id.feature", steps: "$failed._id.step"}, count: {'$sum' => 1}, last_failure: {'$max' => "created_at"}   }}
+        {'$group' => {_id: {failure: "$failed._id.feature", steps: "$failed._id.step"}, count: {'$sum' => 1}, last_failure: {'$max' => "$created_at"}}},
+        { '$sort' => {last_failure: -1}}
+
     )
+    grouped
   end
 
 end
