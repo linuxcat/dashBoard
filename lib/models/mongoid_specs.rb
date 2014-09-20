@@ -7,8 +7,11 @@ class TestRun
 
   def self.group_failed_scenarios(job)
     self.collection.aggregate(
+        {'$match' => {job: job}},
+        {'$sort' => {created_at: -1}},
+        {'$limit' => 1},
         {'$unwind' => '$scenarios'},
-        {'$match' => {job: job, 'scenarios.steps.result.status' => 'failed'}},
+        {'$match' =>{ 'scenarios.steps.result.status' => 'failed'}},
         {'$group' => {_id: {feature: "$scenarios.name", step: "$scenarios.steps"}}}
     )
   end
@@ -25,7 +28,6 @@ class TestRun
         { '$sort' => {count: 1}}
 
     )
-
   end
 
 
@@ -40,6 +42,18 @@ class TestRun
         {"$sort" => {"count" => -1}}
     ]
     collection.aggregate(pipeline)
+  end
+
+  def self.failures_in_latest_run(job)
+    self.collection.aggregate(
+        { '$match' => {job: job}},
+        { '$sort' => {created_at: -1}},
+        { '$limit' => 1},
+        { '$unwind' => '$scenarios' },
+        { '$project' => {'scenarios.steps.result.status' => 1, '_id'  => 0}},
+        { '$unwind' => '$scenarios.steps' },
+        { '$match' => {'scenarios.steps.result.status' => 'failed'}}
+    )
   end
 
 
@@ -75,15 +89,25 @@ class TestRunFailure
   field :failure, type: Array
 
   def self.grouped_failures(job)
-    puts "in ground for #{job}"
     grouped = self.collection.aggregate(
         {'$unwind' => '$failed'},
         {'$match' => {test_run: job}},
-        {'$group' => {_id: {failure: "$failed._id.feature", steps: "$failed._id.step"}, count: {'$sum' => 1}, last_failure: {'$max' => "$created_at"}}},
+        {'$group' => {_id: {failure: "$failed._id.feature"}, count: {'$sum' => 1}, last_failure: {'$max' => "$created_at"}}},
         { '$sort' => {last_failure: -1}}
 
     )
     grouped
+  end
+
+  def self.get_last_failure_date(job, feature)
+    last_failed = self.collection.aggregate(
+        { '$unwind' => '$failed'},
+        { '$match' => {test_run: job }},
+        { '$match' => {'failed._id.feature' => feature}},
+        { '$group' => {_id: {status: '$failed._id.feature'}, last_failed: {'$max' => '$created_at'}}}
+    )
+    last_failed
+
   end
 
 end

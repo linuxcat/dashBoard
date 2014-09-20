@@ -30,8 +30,8 @@ desc 'load web team test run into app'
 task :load_jenkins_data, [:job, :path] do |t, args|
   files = {'DryRun' => 'dry_run.json', 'TestRun' => 'report.json'}
   files.each do |key, value|
-    @jenkins = Jenkins.new('10.198.10.3','ni_test', 'ni_test')
-    results = @jenkins.send(:get_latest_json_results_wt,args[:job], args[:path], value)
+    @jenkins = Jenkins.new('ubuntu-jenkins.ngn-dev.ntch.co.uk')
+    results = @jenkins.get_latest_json_results(args[:job], args[:path], value)
     project_run = []
     results.each do |feature|
       feature['elements'].each do |scenario|
@@ -45,18 +45,11 @@ task :load_jenkins_data, [:job, :path] do |t, args|
 
   end
   grouped = TestRun.group_failed_scenarios(args[:job])
-  failure = TestRunFailure.new(:failed => grouped, :test_run => args[:job] )
-  failure.save!
 
-end
-
-
-
-
-
-desc 'test'
-task :test, [:job] do |t, args|
-  puts "args where #{args[:job]}"
+  if TestRun.failures_in_latest_run(args[:job]).length > 0
+    failure = TestRunFailure.new(:failed => grouped, :test_run => args[:job] )
+    failure.save!
+  end
 
 end
 

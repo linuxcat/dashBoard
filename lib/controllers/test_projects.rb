@@ -31,7 +31,7 @@ class TestProjects < AppBase
     @summary = rp.get_summary_data(params[:id])
     @summary
 
-    erb :homepage_two
+    erb :summary
   end
 
 
