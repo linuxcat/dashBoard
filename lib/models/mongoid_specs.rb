@@ -57,6 +57,32 @@ class TestRun
   end
 
 
+  def self.get_percentage_pass(job, sortby)
+    sorting_options = {'week' => '$week', 'month' => '$month', 'day' => '$dayOfYear'}
+    sort = sorting_options[sortby]
+    percentage_pass = {}
+    percentage_pass[:total_tests] = self.collection.aggregate(
+        {'$match' => {job: job}},
+        {'$sort'=> {created_at: -1}},
+        {'$unwind' => '$scenarios'},
+        {'$project' => {'scenarios.steps.result.status' => 1,created_at: 1, '_id' => 0}},
+        {'$unwind' => '$scenarios.steps'},
+        {'$project' => {'scenarios.steps' => 1, created_at:1, '_id' => 0}},
+        {'$group' =>{ _id: {'date' => {sort => '$created_at'}, 'year' =>{'$year' => '$created_at'}}, total_tests:{ '$sum' => 1}}}
+    )
+    percentage_pass[:total_passed] = self.collection.aggregate(
+        {'$match' => {job: job}},
+        {'$sort'=> {created_at: -1}},
+        {'$unwind' => '$scenarios'},
+        {'$project' => {'scenarios.steps.result.status' => 1,created_at: 1, '_id' => 0}},
+        {'$unwind' => '$scenarios.steps'},
+        {'$match' => {'scenarios.steps.result.status' => 'passed'}},
+        {'$group' =>{ _id: {'date' => {sort => '$created_at'}, 'year' =>{'$year' => '$created_at'}}, total_passed:{ '$sum' => 1}}}
+    )
+    return percentage_pass
+  end
+
+
 
 
 end

@@ -18,7 +18,31 @@ class ResultsProcessor
     summary[:failures] = get_failure_count(job)
     summary[:total_steps_grouped_by_date] = get_column_chart_data_total_scenarios(job)
     summary[:total_tests] = get_dry_run_total_scenarios(job)
+    summary[:current_job] = @job
     summary
+  end
+
+  def get_pass_percentage(job, sortby)
+    percentage_pass = TestRun.get_percentage_pass(job, sortby)
+
+
+    sorted_data = {}
+    percentage_pass.each do |key, value|
+      value.each do |element|
+        if key.to_s == 'total_tests'
+          sorted_data["#{Date.ordinal(element['_id']['year'],element['_id']['date'])}"] = {}
+          sorted_data["#{Date.ordinal(element['_id']['year'],element['_id']['date'])}"]['total_tests'] = element['total_tests']
+        end
+        sorted_data["#{Date.ordinal(element['_id']['year'],element['_id']['date'])}"]['total_passed'] = element['total_passed']
+      end
+    end
+
+    final_data = {}
+    sorted_data.each do |key, element|
+      final_data[key] = (element['total_passed'].fdiv(element['total_tests'])) * 100
+    end
+
+   final_data
   end
 
 

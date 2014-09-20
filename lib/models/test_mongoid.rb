@@ -1,26 +1,52 @@
 require 'mongoid'
 require './mongoid_specs'
+require 'date'
 
 
 Mongoid.load!('../../config/mongoid.yml', :development)
 
-result = TestRun.where(job: "Sun - Firefox Tests - Regression")
+#result = TestRun.where(job: "Sun - Firefox Tests - Regression")
 
 
-grouped = TestRun.group_failed_scenarios('Sun - Chrome Tests - Regression')
+percentage_pass = TestRun.get_percentage_pass('Sun - Chrome Tests - Regression', 'month')
 
-grouped.each do |result|
-  puts result
+
+sorted_data = {}
+percentage_pass.each do |key, value|
+    value.each do |element|
+      if key.to_s == 'total_tests'
+        sorted_data["#{Date.ordinal(element['_id']['year'],element['_id']['date'])}"] = {}
+        sorted_data["#{Date.ordinal(element['_id']['year'],element['_id']['date'])}"]['total_tests'] = element['total_tests']
+      end
+        sorted_data["#{Date.ordinal(element['_id']['year'],element['_id']['date'])}"]['total_passed'] = element['total_passed']
+    end
+  end
+
+  final_data = {}
+  sorted_data.each do |key, element|
+    final_data[key] = (element['total_passed'].fdiv(element['total_tests'])) * 100
+  end
+puts final_data.inspect
+
+
+
+=begin
+puts new.first.inspect
+puts new.last.inspect
+
+sorted_data = {}
+  new.first.each do |element|
+    sorted_data["#{Date.ordinal(element['_id']['year'],element['_id']['date'])}"] = {}
+    sorted_data["#{Date.ordinal(element['_id']['year'],element['_id']['date'])}"]['total_tests'] = element['total_tests']
+  end
+
+new.last.each do |element|
+  sorted_data["#{Date.ordinal(element['_id']['year'],element['_id']['date'])}"]['total_passed'] = element['total_passed']
 end
-#failure = TestRunFailure.new(:failed => grouped, :test_run => 'Sun - Firefox Tests - Regression' )
 
-#failure.save!
-#puts grouped.inspect
 
-puts TestRun.failures_in_latest_run("Sun - Chrome Tests - Regression").length
+puts sorted_data.inspect
 
-results = TestRunFailure.grouped_failures("Sun - Chrome Tests - Regression")
+=end
 
-results.each do |result|
-  puts result['_id']['failure']
-end
+

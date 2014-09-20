@@ -1,0 +1,7 @@
+<div class="col-sm-3 col-md-2 sidebar">
+  <ul class="nav nav-sidebar">
+    <% @summary[:menu_items].each do |item| %>
+        <li><a href="/test-projects/<%= item %>/summary"><%= item %></a></li>
+    <% end %>
+  </ul>
+</div>

@@ -29,9 +29,16 @@ class TestProjects < AppBase
   get '/:id/summary' do
     rp = ResultsProcessor.new(params[:id])
     @summary = rp.get_summary_data(params[:id])
-    @summary
 
     erb :summary
+  end
+
+  get '/:id/detailed_view' do
+    rp = ResultsProcessor.new(params[:id])
+    @summary = rp.get_summary_data(params[:id])
+
+    @day_group = rp.get_pass_percentage(params[:id], params[:sortby])
+    erb :detailed
   end
 
 

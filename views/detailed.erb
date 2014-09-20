@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<%= erb :'partials/_head' %>
+
+
+
+<body>
+
+<%= erb :'partials/_chart_kick_tags' %>
+
+<%= erb :'partials/_top_menu' %>
+
+
+<div class="container-fluid">
+  <div class="row">
+    <%= erb :'partials/_left_menu' %>
+
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+      <h1 class="page-header">Historic View</h1>
+      <p class="date-selector">Day|Week|Month</p>
+      <div class="row placeholders">
+
+
+
+
+        <div class="col-md-12 col-sm-3 placeholder">
+          <%= column_chart @summary[:total_steps_grouped_by_date], colors: ["blue"], height: "500px"  %>
+          <h4>Total Scenarios</h4>
+          <span class="text-muted">Total Scenarios in Test Run</span>
+        </div>
+
+
+
+      </div>
+
+      <div class="row placeholders">
+
+
+
+
+        <div class="col-md-12 col-sm-3 placeholder">
+          <%= line_chart @day_group, height: "500px"  %>
+          <h4>Total Scenarios</h4>
+          <span class="text-muted">Total Scenarios in Test Run</span>
+        </div>
+
+
+
+      </div>
+
+
+      <div class="row placeholders">
+
+
+
+
+        <div class="col-md-12 col-sm-3 placeholder">
+          <%= column_chart @summary[:total_steps_grouped_by_date], colors: ["blue"], height: "500px"  %>
+          <h4>Total Scenarios</h4>
+          <span class="text-muted">Total Scenarios in Test Run</span>
+        </div>
+
+
+
+      </div>
+
+      </div>
+
+
+
+
+    </div>
+  </div>
+
+
+
+</div>
+
+
+<%= erb :'partials/_bootstrap_tags' %>
+
+</body>
+
+
+</html>
