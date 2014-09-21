@@ -1,5 +1,6 @@
 require 'mongoid'
 require_relative '../models/mongoid_specs'
+require 'date'
 #Mongoid.load!(File.expand_path(File.join('../../config', 'mongoid.yml')), :development)
 
 
@@ -7,7 +8,7 @@ class ResultsProcessor
 
   def initialize(job)
     @job = job
-    @end_day = 100
+    @end_day = 365
   end
 
 
@@ -24,16 +25,15 @@ class ResultsProcessor
 
   def get_pass_percentage(job, sortby)
     percentage_pass = TestRun.get_percentage_pass(job, sortby)
-
-
     sorted_data = {}
     percentage_pass.each do |key, value|
       value.each do |element|
+        date_of_group = day_calculation(sortby, element)
         if key.to_s == 'total_tests'
-          sorted_data["#{Date.ordinal(element['_id']['year'],element['_id']['date'])}"] = {}
-          sorted_data["#{Date.ordinal(element['_id']['year'],element['_id']['date'])}"]['total_tests'] = element['total_tests']
+          sorted_data[date_of_group] = {}
+          sorted_data[date_of_group]['total_tests'] = element['total_tests']
         end
-        sorted_data["#{Date.ordinal(element['_id']['year'],element['_id']['date'])}"]['total_passed'] = element['total_passed']
+        sorted_data[date_of_group]['total_passed'] = element['total_passed']
       end
     end
 
@@ -44,6 +44,19 @@ class ResultsProcessor
 
    final_data
   end
+
+  def get_total_scenarios_grouped(job, sortby)
+    total_scenarios = TestRun.get_total_scenarios_grouped(job, sortby)
+    sorted_data = {}
+    total_scenarios.each do |hash|
+      date_of_group = day_calculation(sortby, hash).to_s
+      sorted_data[date_of_group] = hash['total_scenarios']
+
+    end
+
+    sorted_data.to_a
+  end
+
 
 
 
@@ -94,6 +107,18 @@ private
       failure_summary[result['_id']['failure']]['last_failed_date'] = TestRunFailure.get_last_failure_date(job,result['_id']['failure']).first['last_failed']
     end
     failure_summary
+  end
+
+  def day_calculation(sortby, element)
+    case sortby
+      when 'day'
+        day = element['_id']['date']
+      when 'week'
+        day = (element['_id']['date']*7)
+      when 'month'
+        day = Date.new(element['_id']['year'], element['_id']['date'], 1).yday
+    end
+    Date.ordinal(element['_id']['year'], day)
   end
 
 

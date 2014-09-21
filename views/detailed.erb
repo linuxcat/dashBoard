@@ -18,14 +18,14 @@
 
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
       <h1 class="page-header">Historic View</h1>
-      <p class="date-selector">Day|Week|Month</p>
+      <p class="date-selector"><a href="/test-projects/<%=@summary[:current_job]%>/detailed_view?sortby=day">Day</a>|<a href="/test-projects/<%=@summary[:current_job]%>/detailed_view?sortby=week">Week</a>|<a href="/test-projects/<%=@summary[:current_job]%>/detailed_view?sortby=month">Month</a></p>
       <div class="row placeholders">
 
 
 
 
         <div class="col-md-12 col-sm-3 placeholder">
-          <%= column_chart @summary[:total_steps_grouped_by_date], colors: ["blue"], height: "500px"  %>
+          <%= column_chart @total_scenarios, colors: ["blue"], height: "500px"  %>
           <h4>Total Scenarios</h4>
           <span class="text-muted">Total Scenarios in Test Run</span>
         </div>
@@ -40,7 +40,7 @@
 
 
         <div class="col-md-12 col-sm-3 placeholder">
-          <%= line_chart @day_group, height: "500px"  %>
+          <%= line_chart @pass_percentage, height: "500px" ,colors: ["green", "#999"] %>
           <h4>Total Scenarios</h4>
           <span class="text-muted">Total Scenarios in Test Run</span>
         </div>

@@ -36,8 +36,8 @@ class TestProjects < AppBase
   get '/:id/detailed_view' do
     rp = ResultsProcessor.new(params[:id])
     @summary = rp.get_summary_data(params[:id])
-
-    @day_group = rp.get_pass_percentage(params[:id], params[:sortby])
+    @total_scenarios = rp.get_total_scenarios_grouped(params[:id], params[:sortby])
+    @pass_percentage = rp.get_pass_percentage(params[:id], params[:sortby])
     erb :detailed
   end
 
