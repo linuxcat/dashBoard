@@ -27,7 +27,7 @@
         <div class="col-md-12 col-sm-3 placeholder">
           <%= column_chart @total_scenarios, colors: ["blue"], height: "500px"  %>
           <h4>Total Scenarios</h4>
-          <span class="text-muted">Total Scenarios in Test Run</span>
+          <span class="text-muted">Total Scenarios Aggregation</span>
         </div>
 
 
@@ -40,9 +40,9 @@
 
 
         <div class="col-md-12 col-sm-3 placeholder">
-          <%= line_chart @pass_percentage, height: "500px" ,colors: ["green", "#999"] %>
-          <h4>Total Scenarios</h4>
-          <span class="text-muted">Total Scenarios in Test Run</span>
+          <%= line_chart @pass_percentage, height: "500px" ,colors: ["green", "#999"], max:101 %>
+          <h4>Failure Rate %</h4>
+          <span class="text-muted">Failure Rate % Over Time</span>
         </div>
 
 
@@ -56,9 +56,9 @@
 
 
         <div class="col-md-12 col-sm-3 placeholder">
-          <%= column_chart @summary[:total_steps_grouped_by_date], colors: ["blue"], height: "500px"  %>
-          <h4>Total Scenarios</h4>
-          <span class="text-muted">Total Scenarios in Test Run</span>
+          <%= column_chart @total_manual, colors: ["#FF8000"], height: "500px"  %>
+          <h4>Total Manual Tests</h4>
+          <span class="text-muted">Total Manual Tests</span>
         </div>
 
 
@@ -66,6 +66,8 @@
       </div>
 
       </div>
+
+
 
 
 

@@ -98,9 +98,34 @@ class TestRun
   end
 
 
+  def self.get_data_group_dates(job, sort_by)
+    sorting_options = {'week' => '$week', 'month' => '$month', 'day' => '$dayOfYear'}
+    sort = sorting_options[sort_by]
 
+    dates = self.collection.aggregate(
+        { '$match' => {job: job}},
+        { '$sort' => {created_at: -1}},
+        { '$group' => { '_id' => {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}}}
+    )
+    dates
+  end
+
+
+  def self.get_by_date(date, job)
+    start_timestamp = date
+    end_timestamp = date+1
+    day_count = self.collection.aggregate(
+        { '$match' => {job: job, created_at: {'$gte' => start_timestamp.mongoize, '$lt' => end_timestamp.mongoize}}},
+        { '$unwind' => '$scenarios'},
+        { '$group' =>{ '_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => { '$sum' => 1}}}
+    )
+    day_count
+  end
 
 end
+
+
+
 
 
 class DryRun
@@ -118,6 +143,35 @@ class DryRun
     )
 
   end
+
+  def self.get_total_manual_grouped(job, sortby)
+    sorting_options = {'week' => '$week', 'month' => '$month', 'day' => '$dayOfYear'}
+    sort = sorting_options[sortby]
+    scenarios = self.collection.aggregate(
+        { '$match' => {job: job}},
+        { '$unwind' => '$scenarios'},
+        { '$match' => {'scenarios.tags.name' => '@manual'}},
+        { '$project' => { 'scenarios.tags.name' =>1, 'created_at' => 1}},
+        { '$group' => { '_id' => {'date' => {sort => '$created_at'}, 'year' => { '$year' => '$created_at' }}, 'total_scenarios' =>{ '$sum' => 1}}}
+    )
+
+    scenarios
+  end
+
+  def self.get_manual_by_date(date, job)
+    start_timestamp = date
+    end_timestamp = date+1
+    day_count = self.collection.aggregate(
+        { '$match' => {job: job, created_at: {'$gte' => start_timestamp.mongoize, '$lt' => end_timestamp.mongoize}}},
+        { '$unwind' => '$scenarios'},
+        { '$match' => {'scenarios.tags.name' => '@manual'}},
+        { '$group' =>{ '_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => { '$sum' => 1}}}
+    )
+    day_count
+  end
+
+
+
 
 
 end

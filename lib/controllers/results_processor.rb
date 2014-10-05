@@ -57,6 +57,44 @@ class ResultsProcessor
     sorted_data.to_a
   end
 
+  def get_total_manual_grouped(job, sortby)
+    dates = TestRun.get_data_group_dates(job,sortby)
+    puts dates
+    grouped_dates = {}
+    dates.each do |date|
+      date_of_group = day_calculation(sortby, date)
+      data = DryRun.get_manual_by_date(date_of_group, job)
+      case data.size
+        when 0
+          grouped_dates[date_of_group] = 0
+        when 1
+          grouped_dates[Date.ordinal(data.first['_id']['year'], data.first['_id']['date'])] = data.first['total_scenarios']
+      end
+
+    end
+    grouped_dates.to_a
+
+  end
+
+  def get_scenarios_aggregated(job, sortby)
+    dates = TestRun.get_data_group_dates(job,sortby)
+    grouped_dates = {}
+    dates.each do |date|
+      date_of_group = day_calculation(sortby, date)
+      data = TestRun.get_by_date(date_of_group, job)
+      case data.size
+        when 0
+          grouped_dates[date_of_group] = 0
+        when 1
+          grouped_dates[Date.ordinal(data.first['_id']['year'], data.first['_id']['date'])] = data.first['total_scenarios']
+      end
+
+    end
+    grouped_dates.to_a
+
+
+  end
+
 
 
 
@@ -108,6 +146,8 @@ private
     end
     failure_summary
   end
+
+
 
   def day_calculation(sortby, element)
     case sortby
