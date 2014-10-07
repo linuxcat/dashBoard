@@ -27,7 +27,7 @@
         <div class="col-md-12 col-sm-3 placeholder">
           <%= column_chart @total_scenarios, colors: ["blue"], height: "500px"  %>
           <h4>Total Scenarios</h4>
-          <span class="text-muted">Total Scenarios Aggregation</span>
+          <span class="text-muted">Total Scenarios Over Time</span>
         </div>
 
 
@@ -42,7 +42,7 @@
         <div class="col-md-12 col-sm-3 placeholder">
           <%= line_chart @pass_percentage, height: "500px" ,colors: ["green", "#999"], max:101 %>
           <h4>Failure Rate %</h4>
-          <span class="text-muted">Failure Rate % Over Time</span>
+          <span class="text-muted">Pass Rate % Over Time</span>
         </div>
 
 
