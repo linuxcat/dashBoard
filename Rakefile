@@ -27,9 +27,9 @@ end
 
 #rake load_jenkins_data["Sun - Firefox Tests - Regression","/ws/sol-automation/sun-online/src/test/resources/report/"]
 desc 'load web team test run into app'
-task :load_jenkins_data, [:job, :path] do |t, args|
+task :load_jenkins_data, [:job, :path, :hostname] do |t, args|
   puts 'Beginning to Load Data......'
-  @jenkins = Jenkins.new('ubuntu-jenkins.ngn-dev.ntch.co.uk')
+  @jenkins = Jenkins.new(args[:hostname])
 
   n = 0
   retries = 5
