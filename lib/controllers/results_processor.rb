@@ -95,6 +95,27 @@ class ResultsProcessor
 
   end
 
+  def get_total_scenarios_manual(job, sortby)
+    total_scenarios = get_scenarios_aggregated(job,sortby)
+    total_manual = get_total_manual_grouped(job, sortby)
+
+    scenarios = {}
+    scenarios[:name] = 'Features Automated'
+    scenarios[:data] = total_scenarios
+
+    manual = {}
+    manual[:name] = 'Features Manual'
+    manual[:data] = total_manual
+
+    stacked_data = []
+    stacked_data << scenarios
+    stacked_data << manual
+
+    stacked_data
+
+
+  end
+
 
 
 

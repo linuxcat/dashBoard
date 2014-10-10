@@ -25,7 +25,7 @@
 
 
         <div class="col-md-12 col-sm-3 placeholder">
-          <%= column_chart @total_scenarios, colors: ["blue"], height: "500px"  %>
+          <%= column_chart @total_scenarios, :library => {:isStacked => true}, height: "500px"  %>
           <h4>Total Scenarios</h4>
           <span class="text-muted">Total Scenarios Over Time</span>
         </div>
@@ -50,20 +50,7 @@
       </div>
 
 
-      <div class="row placeholders">
 
-
-
-
-        <div class="col-md-12 col-sm-3 placeholder">
-          <%= column_chart @total_manual, colors: ["#FF8000"], height: "500px"  %>
-          <h4>Total Manual Tests</h4>
-          <span class="text-muted">Total Manual Tests</span>
-        </div>
-
-
-
-      </div>
 
       </div>
 

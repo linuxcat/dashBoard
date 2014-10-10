@@ -35,8 +35,8 @@ class TestProjects < AppBase
 
   get '/:id/detailed_view' do
     rp = ResultsProcessor.new(params[:id])
+    @total_scenarios = rp.get_total_scenarios_manual(params[:id], params[:sortby])
     @summary = rp.get_summary_data(params[:id])
-    @total_scenarios = rp.get_scenarios_aggregated(params[:id], params[:sortby])
     @pass_percentage = rp.get_pass_percentage(params[:id], params[:sortby])
     @total_manual = rp.get_total_manual_grouped(params[:id], params[:sortby])
     erb :detailed
