@@ -32,7 +32,7 @@ task :load_jenkins_data, [:job, :path, :hostname] do |t, args|
   @jenkins = Jenkins.new(args[:hostname])
 
   n = 0
-  retries = 5
+  retries = 20
   while n < retries
     n += 1
     if @jenkins.tests_running?
