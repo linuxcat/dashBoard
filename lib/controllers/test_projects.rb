@@ -28,6 +28,7 @@ class TestProjects < AppBase
 
   get '/:id/summary' do
     rp = ResultsProcessor.new(params[:id])
+    @tag_groups = rp.get_grouped_tagged(params[:id])
     @summary = rp.get_summary_data(params[:id])
 
     erb :summary
@@ -41,6 +42,14 @@ class TestProjects < AppBase
     @total_manual = rp.get_total_manual_grouped(params[:id], params[:sortby])
     erb :detailed
   end
+
+  get '/tag-report' do
+    rp = ResultsProcessor.new(params[:id])
+    @tag_groups = rp.get_grouped_tagged(params[:id])
+    erb :tag_report
+  end
+
+
 
 
 

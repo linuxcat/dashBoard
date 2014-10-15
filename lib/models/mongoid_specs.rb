@@ -11,23 +11,35 @@ class TestRun
         {'$sort' => {created_at: -1}},
         {'$limit' => 1},
         {'$unwind' => '$scenarios'},
-        {'$match' =>{ 'scenarios.steps.result.status' => 'failed'}},
+        {'$match' => {'scenarios.steps.result.status' => 'failed'}},
         {'$group' => {_id: {feature: "$scenarios.name", step: "$scenarios.steps"}}}
     )
   end
 
   def self.group_by_status(job)
     self.collection.aggregate(
-        { '$match' => {job: job}},
-        { '$sort' => {created_at: -1}},
-        { '$limit' => 1},
-        { '$unwind' => "$scenarios"},
-        { '$project' => {"scenarios.steps.result.status" => 1, "_id" => 0}},
-        { '$unwind' => "$scenarios.steps"},
-        { '$group' => {_id: {status: "$scenarios.steps.result.status"}, count: {'$sum' => 1}}},
-        { '$sort' => {count: 1}}
+        {'$match' => {job: job}},
+        {'$sort' => {created_at: -1}},
+        {'$limit' => 1},
+        {'$unwind' => "$scenarios"},
+        {'$project' => {"scenarios.steps.result.status" => 1, "_id" => 0}},
+        {'$unwind' => "$scenarios.steps"},
+        {'$group' => {_id: {status: "$scenarios.steps.result.status"}, count: {'$sum' => 1}}},
+        {'$sort' => {count: 1}}
 
     )
+  end
+
+  def self.total_scenarios_in_run(job)
+    self.collection.aggregate(
+        {'$match' => {job: job}},
+        {'$sort' => {created_at: -1}},
+        {'$limit' => 1},
+        {'$unwind' => "$scenarios"},
+        {'$group' => {_id: "null", count: {"$sum" => 1}}}
+    )
+
+
   end
 
 
@@ -46,13 +58,13 @@ class TestRun
 
   def self.failures_in_latest_run(job)
     self.collection.aggregate(
-        { '$match' => {job: job}},
-        { '$sort' => {created_at: -1}},
-        { '$limit' => 1},
-        { '$unwind' => '$scenarios' },
-        { '$project' => {'scenarios.steps.result.status' => 1, '_id'  => 0}},
-        { '$unwind' => '$scenarios.steps' },
-        { '$match' => {'scenarios.steps.result.status' => 'failed'}}
+        {'$match' => {job: job}},
+        {'$sort' => {created_at: -1}},
+        {'$limit' => 1},
+        {'$unwind' => '$scenarios'},
+        {'$project' => {'scenarios.steps.result.status' => 1, '_id' => 0}},
+        {'$unwind' => '$scenarios.steps'},
+        {'$match' => {'scenarios.steps.result.status' => 'failed'}}
     )
   end
 
@@ -64,21 +76,21 @@ class TestRun
     percentage_pass = {}
     percentage_pass[:total_tests] = self.collection.aggregate(
         {'$match' => {job: job}},
-        {'$sort'=> {created_at: -1}},
+        {'$sort' => {created_at: -1}},
         {'$unwind' => '$scenarios'},
-        {'$project' => {'scenarios.steps.result.status' => 1,created_at: 1, '_id' => 0}},
+        {'$project' => {'scenarios.steps.result.status' => 1, created_at: 1, '_id' => 0}},
         {'$unwind' => '$scenarios.steps'},
-        {'$project' => {'scenarios.steps' => 1, created_at:1, '_id' => 0}},
-        {'$group' =>{ _id: {'date' => {sort => '$created_at'}, 'year' =>{'$year' => '$created_at'}}, total_tests:{ '$sum' => 1}}}
+        {'$project' => {'scenarios.steps' => 1, created_at: 1, '_id' => 0}},
+        {'$group' => {_id: {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}, total_tests: {'$sum' => 1}}}
     )
     percentage_pass[:total_passed] = self.collection.aggregate(
         {'$match' => {job: job}},
-        {'$sort'=> {created_at: -1}},
+        {'$sort' => {created_at: -1}},
         {'$unwind' => '$scenarios'},
-        {'$project' => {'scenarios.steps.result.status' => 1,created_at: 1, '_id' => 0}},
+        {'$project' => {'scenarios.steps.result.status' => 1, created_at: 1, '_id' => 0}},
         {'$unwind' => '$scenarios.steps'},
         {'$match' => {'scenarios.steps.result.status' => 'passed'}},
-        {'$group' =>{ _id: {'date' => {sort => '$created_at'}, 'year' =>{'$year' => '$created_at'}}, total_passed:{ '$sum' => 1}}}
+        {'$group' => {_id: {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}, total_passed: {'$sum' => 1}}}
     )
     return percentage_pass
   end
@@ -88,10 +100,10 @@ class TestRun
     sort = sorting_options[sortby]
 
     scenarios = self.collection.aggregate(
-      {'$match' => {job: job}},
-      {'$sort'=> {created_at: -1}},
-      {'$unwind' => '$scenarios'},
-      {'$group' =>{ _id: {'date' => {sort => '$created_at'}, 'year' =>{'$year' => '$created_at'}}, total_scenarios:{ '$sum' => 1}}}
+        {'$match' => {job: job}},
+        {'$sort' => {created_at: -1}},
+        {'$unwind' => '$scenarios'},
+        {'$group' => {_id: {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}, total_scenarios: {'$sum' => 1}}}
     )
 
     scenarios
@@ -103,9 +115,9 @@ class TestRun
     sort = sorting_options[sort_by]
 
     dates = self.collection.aggregate(
-        { '$match' => {job: job}},
-        { '$sort' => {created_at: -1}},
-        { '$group' => { '_id' => {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}}}
+        {'$match' => {job: job}},
+        {'$sort' => {created_at: -1}},
+        {'$group' => {'_id' => {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}}}
     )
     dates
   end
@@ -115,18 +127,15 @@ class TestRun
     start_timestamp = date
     end_timestamp = date+1
     day_count = self.collection.aggregate(
-        { '$match' => {job: job, created_at: {'$gte' => start_timestamp.mongoize, '$lt' => end_timestamp.mongoize}}},
-        { '$limit' => 1},
-        { '$unwind' => '$scenarios'},
-        { '$group' =>{ '_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => { '$sum' => 1}}}
+        {'$match' => {job: job, created_at: {'$gte' => start_timestamp.mongoize, '$lt' => end_timestamp.mongoize}}},
+        {'$limit' => 1},
+        {'$unwind' => '$scenarios'},
+        {'$group' => {'_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => {'$sum' => 1}}}
     )
     day_count
   end
 
 end
-
-
-
 
 
 class DryRun
@@ -139,8 +148,8 @@ class DryRun
   def self.return_latest_dry_run(job)
     self.collection.aggregate(
         {'$match' => {job: job}},
-        { '$sort' => {created_at: -1}},
-        { '$limit' => 1}
+        {'$sort' => {created_at: -1}},
+        {'$limit' => 1}
     )
 
   end
@@ -149,11 +158,11 @@ class DryRun
     sorting_options = {'week' => '$week', 'month' => '$month', 'day' => '$dayOfYear'}
     sort = sorting_options[sortby]
     scenarios = self.collection.aggregate(
-        { '$match' => {job: job}},
-        { '$unwind' => '$scenarios'},
-        { '$match' => {'scenarios.tags.name' => '@manual'}},
-        { '$project' => { 'scenarios.tags.name' =>1, 'created_at' => 1}},
-        { '$group' => { '_id' => {'date' => {sort => '$created_at'}, 'year' => { '$year' => '$created_at' }}, 'total_scenarios' =>{ '$sum' => 1}}}
+        {'$match' => {job: job}},
+        {'$unwind' => '$scenarios'},
+        {'$match' => {'scenarios.tags.name' => '@manual'}},
+        {'$project' => {'scenarios.tags.name' => 1, 'created_at' => 1}},
+        {'$group' => {'_id' => {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => {'$sum' => 1}}}
     )
 
     scenarios
@@ -163,17 +172,39 @@ class DryRun
     start_timestamp = date
     end_timestamp = date+1
     day_count = self.collection.aggregate(
-        { '$match' => {job: job, created_at: {'$gte' => start_timestamp.mongoize, '$lt' => end_timestamp.mongoize}}},
-        { '$limit' => 1},
-        { '$unwind' => '$scenarios'},
-        { '$match' => {'scenarios.tags.name' => '@manual'}},
-        { '$group' =>{ '_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => { '$sum' => 1}}}
+        {'$match' => {job: job, created_at: {'$gte' => start_timestamp.mongoize, '$lt' => end_timestamp.mongoize}}},
+        {'$limit' => 1},
+        {'$unwind' => '$scenarios'},
+        {'$match' => {'scenarios.tags.name' => '@manual'}},
+        {'$group' => {'_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => {'$sum' => 1}}}
     )
     day_count
   end
 
 
+  def self.get_total_manual_scenarios(job)
+    self.collection.aggregate(
+        {'$match' => {job: "iOS_7_Ipad_Regression_build_nightly"}},
+        {'$sort' => {created_at: 1}},
+        {'$limit' => 1},
+        {'$unwind' => '$scenarios'},
+        {'$project' => {'scenarios.tags' => 1}},
+        {'$match' => {'scenarios.tags.name' => '@manual'}},
+        {'$group' => {'_id' => 'null', count: {'$sum' => 1}}}
+    )
+  end
 
+  def self.get_total_group_tags(job)
+    self.collection.aggregate(
+        {'$match' => {job: job}},
+        {'$sort' => {created_at: 1}},
+        {'$limit' => 1},
+        {'$unwind' => '$scenarios'},
+        {'$project' => {'scenarios.tags' => 1}},
+        {'$unwind' => '$scenarios.tags'},
+        {'$group' => {'_id' => {'tag' => '$scenarios.tags.name'}, 'count' => {'$sum' => 1}}}
+    )
+  end
 
 
 end
@@ -190,7 +221,7 @@ class TestRunFailure
         {'$unwind' => '$failed'},
         {'$match' => {test_run: job}},
         {'$group' => {_id: {failure: "$failed._id.feature"}, count: {'$sum' => 1}, last_failure: {'$max' => "$created_at"}}},
-        { '$sort' => {last_failure: -1}}
+        {'$sort' => {last_failure: -1}}
 
     )
     grouped
@@ -198,10 +229,10 @@ class TestRunFailure
 
   def self.get_last_failure_date(job, feature)
     last_failed = self.collection.aggregate(
-        { '$unwind' => '$failed'},
-        { '$match' => {test_run: job }},
-        { '$match' => {'failed._id.feature' => feature}},
-        { '$group' => {_id: {status: '$failed._id.feature'}, last_failed: {'$max' => '$created_at'}}}
+        {'$unwind' => '$failed'},
+        {'$match' => {test_run: job}},
+        {'$match' => {'failed._id.feature' => feature}},
+        {'$group' => {_id: {status: '$failed._id.feature'}, last_failed: {'$max' => '$created_at'}}}
     )
     last_failed
 

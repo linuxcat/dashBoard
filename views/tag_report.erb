@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<%= erb :'partials/_head' %>
+
+<body>
+
+<%= erb :'partials/_chart_kick_tags' %>
+<%= erb :'partials/_top_menu' %>
+
+
+<div class="container-fluid">
+  <div class="row">
+    <%= erb :'partials/_left_menu' %>
+
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+      <h1 class="page-header">Dashboard</h1>
+
+      <div class="row placeholders">
+        <div class="col-md-12 col-sm-3 placeholder">
+          <%= pie_chart @tag_groups %>
+          <h4>Results</h4>
+          <span class="text-muted">Latest Build Results</span>
+        </div>
+      </div>
+    </div>
+   </div>
+  </div>
+
+
+
+    <%= erb :'partials/_bootstrap_tags' %>
+
+</body>
+
+
+</html>

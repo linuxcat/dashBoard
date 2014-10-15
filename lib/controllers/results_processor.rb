@@ -20,6 +20,8 @@ class ResultsProcessor
     summary[:total_steps_grouped_by_date] = get_column_chart_data_total_scenarios(job)
     summary[:total_tests] = get_dry_run_total_scenarios(job)
     summary[:current_job] = @job
+    summary[:total_scenarios_in_run] =  TestRun.total_scenarios_in_run(job).first['count']
+    summary[:total_manual_scenarios] = DryRun.get_total_manual_scenarios(job).first['count']
     summary
   end
 
@@ -95,16 +97,27 @@ class ResultsProcessor
 
   end
 
+  def get_grouped_tagged(job)
+    results = DryRun.get_total_group_tags(job)
+
+    values ={}
+    results.each do |outer_hash|
+      values[outer_hash['_id']["tag"]] = outer_hash['count']
+    end
+
+    values.to_a
+  end
+
   def get_total_scenarios_manual(job, sortby)
     total_scenarios = get_scenarios_aggregated(job,sortby)
     total_manual = get_total_manual_grouped(job, sortby)
 
     scenarios = {}
-    scenarios[:name] = 'Features Automated'
+    scenarios[:name] = 'Scenarios Automated'
     scenarios[:data] = total_scenarios
 
     manual = {}
-    manual[:name] = 'Features Manual'
+    manual[:name] = 'Scenarios Manual'
     manual[:data] = total_manual
 
     stacked_data = []

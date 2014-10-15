@@ -22,5 +22,14 @@ class HomePage < AppBase
 
   end
 
+  get '/tag-report' do
+    rp = ResultsProcessor.new(params[:id])
+    @summary = rp.get_summary_data('iOS_7_Ipad_Regression_build_nightly')
+    @tag_groups = rp.get_grouped_tagged('iOS_7_Ipad_Regression_build_nightly')
+    erb :tag_report
+  end
+
+
+
 
 end

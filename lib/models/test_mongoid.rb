@@ -8,11 +8,6 @@ require_relative '../../lib/controllers/jenkins'
 Mongoid.load!('../../config/mongoid.yml', :development)
 
 
-@j = Jenkins.new('ubuntu-jenkins.ngn-dev.ntch.co.uk')
-
-json = @j.tests_running?
-
-puts json
 
 #result = TestRun.where(job: "Sun - Firefox Tests - Regression")
 =begin
@@ -22,9 +17,11 @@ data = rp.get_total_manual_grouped_two('Sun - Chrome Tests - Regression','week')
 puts data.inspect
 =end
 
-n = 1
-retries = 5
-while n < retries
-  puts 'hello'
-  n += 1
-end
+results = DryRun.get_total_group_tags("iOS_7_Ipad_Regression_build_nightly")
+
+  values ={}
+  results.each do |outer_hash|
+    values[outer_hash['_id']["tag"]] = outer_hash['count']
+  end
+
+ puts values.to_a.inspect

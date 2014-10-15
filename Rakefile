@@ -45,8 +45,10 @@ task :load_jenkins_data, [:job, :path, :hostname] do |t, args|
         results = @jenkins.get_latest_json_results(args[:job], args[:path], value)
         project_run = []
         results.each do |feature|
-          feature['elements'].each do |scenario|
-            project_run << scenario
+          if !feature["elements"].nil?
+            feature['elements'].each do |scenario|
+              project_run << scenario
+            end
           end
         end
         class_name = Object.const_get(key, Class.new)
