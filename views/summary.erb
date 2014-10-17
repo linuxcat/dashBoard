@@ -17,7 +17,7 @@
       <h1 class="page-header">Dashboard</h1>
 
       <div class="row placeholders">
-        <div class="col-md-3 col-sm-3 placeholder">
+        <div class="col-md-4 col-sm-3 placeholder">
           <a href= "/test-projects/<%=@summary[:current_job]%>/detailed_view?sortby=day"> <%= pie_chart [["Pass", @summary[:status_summary]['passed']], ["Fail",  @summary[:status_summary]['failed']]], colors: ["green", "red"] %> </a>
           <h4>Results</h4>
           <span class="text-muted">Latest Build Results</span>
@@ -25,14 +25,14 @@
 
 
 
-        <div class="col-md-3 col-sm-3 placeholder">
+        <div class="col-md-4 col-sm-3 placeholder">
           <a href= "/test-projects/<%=@summary[:current_job]%>/detailed_view?sortby=day"> <%= column_chart @summary[:total_steps_grouped_by_date], colors: ["blue"] %> </a>
           <h4>Total Scenarios</h4>
           <span class="text-muted">Total Scenarios in Test Run</span>
         </div>
 
-        <div class="col-md-3 col-sm-3 placeholder">
-          <a href= "/test-projects/<%=@summary[:current_job]%>/detailed_view?sortby=day"> <%= bar_chart [["Total Acceptance Tests", @summary[:total_tests] - @summary[:total_manual_scenarios]], ["Number Automated", @summary[:total_scenarios_in_run]    ], ["Total Manual", @summary[:total_manual_scenarios]    ]], colors: ["purple", "red"] %> </a>
+        <div class="col-md-4 col-sm-3 placeholder">
+          <a href= "/test-projects/<%=@summary[:current_job]%>/detailed_view?sortby=day"> <%= bar_chart [["Total Acceptance Tests", @tag_groups.to_h[regression_tag]], ["Number Automated", @summary[:total_scenarios_in_run]    ], ["Total Manual", @summary[:total_manual_scenarios]    ]], colors: ["purple", "red"] %> </a>
           <h4>Total Scenarios / Automated Scenarios</h4>
           <span class="text-muted">Total Scenarios Breakdown></span>
         </div>

@@ -61,11 +61,28 @@ class ResultsProcessor
 
   def get_total_manual_grouped(job, sortby)
     dates = TestRun.get_data_group_dates(job,sortby)
-    puts dates
     grouped_dates = {}
     dates.each do |date|
       date_of_group = day_calculation(sortby, date)
       data = DryRun.get_manual_by_date(date_of_group, job)
+      case data.size
+        when 0
+          grouped_dates[date_of_group] = 0
+        when 1
+          grouped_dates[Date.ordinal(data.first['_id']['year'], data.first['_id']['date'])] = data.first['total_scenarios']
+      end
+
+    end
+    grouped_dates.to_a
+
+  end
+
+  def get_total_regression_grouped(job, sortby, regression_tag)
+    dates = TestRun.get_data_group_dates(job,sortby)
+    grouped_dates = {}
+    dates.each do |date|
+      date_of_group = day_calculation(sortby, date)
+      data = DryRun.get_regression_by_date(date_of_group, job, regression_tag)
       case data.size
         when 0
           grouped_dates[date_of_group] = 0
@@ -108,9 +125,10 @@ class ResultsProcessor
     values.to_a
   end
 
-  def get_total_scenarios_manual(job, sortby)
+  def get_total_scenarios_manual(job, sortby, regression_tag)
     total_scenarios = get_scenarios_aggregated(job,sortby)
     total_manual = get_total_manual_grouped(job, sortby)
+    total_regression = get_total_regression_grouped(job, sortby, regression_tag)
 
     scenarios = {}
     scenarios[:name] = 'Scenarios Automated'
@@ -120,9 +138,27 @@ class ResultsProcessor
     manual[:name] = 'Scenarios Manual'
     manual[:data] = total_manual
 
+
+
+    total_regression_scenarios = {}
+    total_regression_scenarios[:name] = 'Remaining'
+    total_regression_scenarios[:data] = total_regression
+
+    remaining_tests = {}
+    total_regression_scenarios[:data].to_h.each do |key, value|
+      total_executable_tests =  total_scenarios.to_h[key] + total_manual.to_h[key]
+      to_do = value - total_executable_tests
+
+      remaining_tests[key] = to_do
+    end
+
+    total_regression_scenarios[:data] = remaining_tests.to_a
+
+
     stacked_data = []
     stacked_data << scenarios
     stacked_data << manual
+    stacked_data << total_regression_scenarios
 
     stacked_data
 

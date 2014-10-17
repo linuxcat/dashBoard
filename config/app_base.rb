@@ -4,6 +4,11 @@ require 'mongoid'
 
 
 class AppBase < Sinatra::Base
+  require_relative '../helpers/universal_helpers'
+
+
+  helpers Sinatra::EnvironmentConstantHelper
+
   configure do
     :development
     Bundler.setup(:default, :assets, :development)

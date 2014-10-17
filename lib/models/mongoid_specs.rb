@@ -181,10 +181,22 @@ class DryRun
     day_count
   end
 
+  def self.get_regression_by_date(date, job, regression_tag)
+    start_timestamp = date
+    end_timestamp = date+1
+    day_count = self.collection.aggregate(
+        {'$match' => {job: job, created_at: {'$gte' => start_timestamp.mongoize, '$lt' => end_timestamp.mongoize}}},
+        {'$limit' => 1},
+        {'$unwind' => '$scenarios'},
+        {'$match' => {'scenarios.tags.name' => regression_tag}},
+        {'$group' => {'_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => {'$sum' => 1}}}
+    )
+    day_count
+  end
 
   def self.get_total_manual_scenarios(job)
     self.collection.aggregate(
-        {'$match' => {job: "iOS_7_Ipad_Regression_build_nightly"}},
+        {'$match' => {job: job}},
         {'$sort' => {created_at: 1}},
         {'$limit' => 1},
         {'$unwind' => '$scenarios'},

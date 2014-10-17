@@ -19,6 +19,7 @@ require_relative 'lib/controllers/results_processor'
 require_relative 'lib/controllers/git_hub'
 require_relative 'lib/models/mongoid_specs'
 
+
 #Chartkick.options[:html] = '<div id="%{id}" style="height: %{height};">Loading...</div>'
 class SkeletonApp < Sinatra::Base
   set :app_file, __FILE__
