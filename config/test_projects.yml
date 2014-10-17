@@ -6,4 +6,4 @@ times_web_team:
   regression_tag:
 app_team:
   tag_project: 'iOS_7_Ipad_Regression_build_nightly'
-  regression_tag:
+  regression_tag: '@ios'
