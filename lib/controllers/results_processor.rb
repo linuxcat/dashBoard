@@ -17,7 +17,7 @@ class ResultsProcessor
     summary[:menu_items] = TestRun.distinct("job")
     summary[:status_summary] = prepare_pass_fail_hash(job)
     summary[:failures] = get_failure_count(job)
-    summary[:total_steps_grouped_by_date] = get_column_chart_data_total_scenarios(job)
+    summary[:total_scenarios_grouped_by_day] = get_total_scenarios_ran_aggregated(job, 'day')
     summary[:total_tests] = get_dry_run_total_scenarios(job)
     summary[:current_job] = @job
     summary[:total_scenarios_in_run] =  TestRun.total_scenarios_in_run(job).first['count']
@@ -60,7 +60,7 @@ class ResultsProcessor
   end
 
   def get_total_manual_grouped(job, sortby)
-    dates = TestRun.get_data_group_dates(job,sortby)
+    dates = TestRun.get_dates_for_test_runs(job,sortby)
     grouped_dates = {}
     dates.each do |date|
       date_of_group = day_calculation(sortby, date)
@@ -78,7 +78,7 @@ class ResultsProcessor
   end
 
   def get_total_regression_grouped(job, sortby, regression_tag)
-    dates = TestRun.get_data_group_dates(job,sortby)
+    dates = TestRun.get_dates_for_test_runs(job,sortby)
     grouped_dates = {}
     dates.each do |date|
       date_of_group = day_calculation(sortby, date)
@@ -95,12 +95,12 @@ class ResultsProcessor
 
   end
 
-  def get_scenarios_aggregated(job, sortby)
-    dates = TestRun.get_data_group_dates(job,sortby)
+  def get_total_scenarios_ran_aggregated(job, sortby)
+    dates = TestRun.get_dates_for_test_runs(job,sortby)
     grouped_dates = {}
     dates.each do |date|
       date_of_group = day_calculation(sortby, date)
-      data = TestRun.get_by_date(date_of_group, job)
+      data = TestRun.get_scenarios_ran_by_date(date_of_group, job)
       case data.size
         when 0
           grouped_dates[date_of_group] = 0
@@ -126,7 +126,7 @@ class ResultsProcessor
   end
 
   def get_total_scenarios_manual(job, sortby, regression_tag)
-    total_scenarios = get_scenarios_aggregated(job,sortby)
+    total_scenarios = get_total_scenarios_ran_aggregated(job,sortby)
     total_manual = get_total_manual_grouped(job, sortby)
     total_regression = get_total_regression_grouped(job, sortby, regression_tag)
 

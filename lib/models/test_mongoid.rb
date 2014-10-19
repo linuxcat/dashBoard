@@ -17,11 +17,10 @@ data = rp.get_total_manual_grouped_two('Sun - Chrome Tests - Regression','week')
 puts data.inspect
 =end
 
-results = DryRun.get_total_group_tags("iOS_7_Ipad_Regression_build_nightly")
 
-  values ={}
-  results.each do |outer_hash|
-    values[outer_hash['_id']["tag"]] = outer_hash['count']
-  end
+rp = ResultsProcessor.new('Sun - Firefox Tests - Regression')
 
- puts values.to_a.inspect
+results = rp.get_total_scenarios_manual('Sun - Firefox Tests - Regression','day', '@regression')
+
+
+puts results

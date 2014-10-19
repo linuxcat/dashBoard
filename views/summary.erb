@@ -26,7 +26,7 @@
 
 
         <div class="col-md-4 col-sm-3 placeholder">
-          <a href= "/test-projects/<%=@summary[:current_job]%>/detailed_view?sortby=day"> <%= column_chart @summary[:total_steps_grouped_by_date], colors: ["blue"] %> </a>
+          <a href= "/test-projects/<%=@summary[:current_job]%>/detailed_view?sortby=day"> <%= column_chart @summary[:total_scenarios_grouped_by_day], colors: ["blue"] %> </a>
           <h4>Total Scenarios</h4>
           <span class="text-muted">Total Scenarios in Test Run</span>
         </div>

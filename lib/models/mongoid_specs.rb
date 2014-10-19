@@ -12,6 +12,7 @@ class TestRun
         {'$limit' => 1},
         {'$unwind' => '$scenarios'},
         {'$match' => {'scenarios.steps.result.status' => 'failed'}},
+        {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
         {'$group' => {_id: {feature: "$scenarios.name", step: "$scenarios.steps"}}}
     )
   end
@@ -36,6 +37,7 @@ class TestRun
         {'$sort' => {created_at: -1}},
         {'$limit' => 1},
         {'$unwind' => "$scenarios"},
+        {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
         {'$group' => {_id: "null", count: {"$sum" => 1}}}
     )
 
@@ -103,6 +105,7 @@ class TestRun
         {'$match' => {job: job}},
         {'$sort' => {created_at: -1}},
         {'$unwind' => '$scenarios'},
+        {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
         {'$group' => {_id: {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}, total_scenarios: {'$sum' => 1}}}
     )
 
@@ -110,26 +113,29 @@ class TestRun
   end
 
 
-  def self.get_data_group_dates(job, sort_by)
+  def self.get_dates_for_test_runs(job, sort_by)
     sorting_options = {'week' => '$week', 'month' => '$month', 'day' => '$dayOfYear'}
     sort = sorting_options[sort_by]
 
     dates = self.collection.aggregate(
         {'$match' => {job: job}},
         {'$sort' => {created_at: -1}},
+        {'$unwind' => '$scenarios'},
+        {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
         {'$group' => {'_id' => {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}}}
     )
     dates
   end
 
 
-  def self.get_by_date(date, job)
+  def self.get_scenarios_ran_by_date(date, job)
     start_timestamp = date
     end_timestamp = date+1
     day_count = self.collection.aggregate(
         {'$match' => {job: job, created_at: {'$gte' => start_timestamp.mongoize, '$lt' => end_timestamp.mongoize}}},
         {'$limit' => 1},
         {'$unwind' => '$scenarios'},
+        {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
         {'$group' => {'_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => {'$sum' => 1}}}
     )
     day_count
@@ -188,6 +194,7 @@ class DryRun
         {'$match' => {job: job, created_at: {'$gte' => start_timestamp.mongoize, '$lt' => end_timestamp.mongoize}}},
         {'$limit' => 1},
         {'$unwind' => '$scenarios'},
+        {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
         {'$match' => {'scenarios.tags.name' => regression_tag}},
         {'$group' => {'_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => {'$sum' => 1}}}
     )
