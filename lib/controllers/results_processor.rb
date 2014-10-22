@@ -38,13 +38,15 @@ class ResultsProcessor
         sorted_data[date_of_group]['total_passed'] = element['total_passed']
       end
     end
-
     final_data = {}
     sorted_data.each do |key, element|
+      if element['total_passed'].nil?
+        element['total_passed'] = 0
+      end
       final_data[key] = (element['total_passed'].fdiv(element['total_tests'])) * 100
     end
 
-   final_data
+    final_data
   end
 
   def get_total_scenarios_grouped(job, sortby)
