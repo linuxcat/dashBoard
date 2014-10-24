@@ -147,7 +147,7 @@ class ResultsProcessor
     total_regression_scenarios[:data] = total_regression
 
     remaining_tests = {}
-    total_regression_scenarios[:data].to_h.each do |key, value|
+    total_regression_scenarios.sort[:data].to_h.each do |key, value|
       total_executable_tests =  total_scenarios.to_h[key] + total_manual.to_h[key]
       to_do = value - total_executable_tests
 
