@@ -134,20 +134,20 @@ class ResultsProcessor
 
     scenarios = {}
     scenarios[:name] = 'Scenarios Automated'
-    scenarios[:data] = total_scenarios
+    scenarios[:data] = total_scenarios.last(7)
 
     manual = {}
     manual[:name] = 'Scenarios Manual'
-    manual[:data] = total_manual
+    manual[:data] = total_manual.last(7)
 
 
 
     total_regression_scenarios = {}
     total_regression_scenarios[:name] = 'Remaining'
-    total_regression_scenarios[:data] = total_regression
+    total_regression_scenarios[:data] = total_regression.last(7)
 
     remaining_tests = {}
-    total_regression_scenarios.sort[:data].to_h.each do |key, value|
+    total_regression_scenarios[:data].to_h.each do |key, value|
       total_executable_tests =  total_scenarios.to_h[key] + total_manual.to_h[key]
       to_do = value - total_executable_tests
 
