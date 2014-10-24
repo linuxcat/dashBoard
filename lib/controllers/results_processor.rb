@@ -17,7 +17,7 @@ class ResultsProcessor
     summary[:menu_items] = TestRun.distinct("job")
     summary[:status_summary] = prepare_pass_fail_hash(job)
     summary[:failures] = get_failure_count(job)
-    summary[:total_scenarios_grouped_by_day] = get_total_scenarios_ran_aggregated(job, 'day')
+    summary[:total_scenarios_grouped_by_day] = get_total_scenarios_ran_aggregated(job, 'day').sort
     summary[:total_tests] = get_dry_run_total_scenarios(job)
     summary[:current_job] = @job
     summary[:total_scenarios_in_run] =  TestRun.total_scenarios_in_run(job).first['count']
