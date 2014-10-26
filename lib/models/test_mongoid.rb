@@ -17,10 +17,11 @@ data = rp.get_total_manual_grouped_two('Sun - Chrome Tests - Regression','week')
 puts data.inspect
 =end
 
-
 rp = ResultsProcessor.new('Sun - Firefox Tests - Regression')
 
-results = rp.get_total_scenarios_manual('Sun - Firefox Tests - Regression','day', '@regression')
-
+results = rp.get_pass_percentage('Sun - Chrome Tests - Regression', 'day')
 
 puts results
+h = (results.sort_by { |k, v|}.last 7).to_h
+
+puts h.inspect

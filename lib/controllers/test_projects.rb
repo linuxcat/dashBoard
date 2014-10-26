@@ -29,15 +29,15 @@ class TestProjects < AppBase
   get '/:id/summary' do
     rp = ResultsProcessor.new(params[:id])
     @tag_groups = rp.get_grouped_tagged(params[:id])
-    @summary = rp.get_summary_data(params[:id])
+    @summary = rp.get_summary_data(params[:id],regression_tag)
 
     erb :summary
   end
 
   get '/:id/detailed_view' do
     rp = ResultsProcessor.new(params[:id])
-    @total_scenarios = rp.get_total_scenarios_manual(params[:id], params[:sortby], regression_tag)
-    @summary = rp.get_summary_data(params[:id])
+    @total_scenarios = rp.get_total_scenarios_breakdown(params[:id], params[:sortby], regression_tag)
+    @summary = rp.get_summary_data(params[:id],regression_tag)
     @pass_percentage = rp.get_pass_percentage(params[:id], params[:sortby])
     @total_manual = rp.get_total_manual_grouped(params[:id], params[:sortby])
     erb :detailed

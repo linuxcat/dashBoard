@@ -25,7 +25,7 @@
 
 
         <div class="col-md-12 col-sm-3 placeholder">
-          <%= column_chart @total_scenarios, :library => {:isStacked => true}, height: "500px"  %>
+          <%= column_chart @total_scenarios, :library => {:isStacked => true, :series => [{color: 'green', visibleInLegend: true},{color: 'red', visibleInLegend: true},{color: 'yellow', visibleInLegend: true},{color: 'blue', visibleInLegend: true}]}, height: "500px"  %>
           <h4>Total Scenarios</h4>
           <span class="text-muted">Total Scenarios Over Time</span>
         </div>

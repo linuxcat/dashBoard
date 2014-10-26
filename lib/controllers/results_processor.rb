@@ -11,14 +11,14 @@ class ResultsProcessor
     @end_day = 365
   end
 
-
-  def get_summary_data(job)
+  #TODO all data should come from results processor not directly from the model.
+  def get_summary_data(job, regression_tag)
     summary = {}
     summary[:menu_items] = TestRun.distinct("job")
     summary[:status_summary] = prepare_pass_fail_hash(job)
     summary[:failures] = get_failure_count(job)
     summary[:total_scenarios_grouped_by_day] = get_total_scenarios_ran_aggregated(job, 'day').sort
-    summary[:total_tests] = get_dry_run_total_scenarios(job)
+    summary[:total_tests] = DryRun.get_latest_total_scenarios(job, regression_tag).count
     summary[:current_job] = @job
     summary[:total_scenarios_in_run] =  TestRun.total_scenarios_in_run(job).first['count']
     summary[:total_manual_scenarios] = DryRun.get_total_manual_scenarios(job).first['count']
@@ -46,9 +46,10 @@ class ResultsProcessor
       final_data[key] = (element['total_passed'].fdiv(element['total_tests'])) * 100
     end
 
-    final_data
+    (final_data.sort_by { |k, v|}.last 7).to_h
   end
 
+  #TODO Refector to DRY
   def get_total_scenarios_grouped(job, sortby)
     total_scenarios = TestRun.get_total_scenarios_grouped(job, sortby)
     sorted_data = {}
@@ -61,6 +62,7 @@ class ResultsProcessor
     sorted_data.to_a
   end
 
+  #TODO Refector to DRY
   def get_total_manual_grouped(job, sortby)
     dates = TestRun.get_dates_for_test_runs(job,sortby)
     grouped_dates = {}
@@ -77,6 +79,24 @@ class ResultsProcessor
     end
     grouped_dates.to_a
 
+  end
+
+  #TODO Refector to DRY
+  def get_total_failed_grouped(job, sortby)
+    dates = TestRun.get_dates_for_test_runs(job,sortby)
+    grouped_dates = {}
+    dates.each do |date|
+      date_of_group = day_calculation(sortby, date)
+      data = TestRun.get_failed_by_date(date_of_group, job)
+      case data.size
+        when 0
+          grouped_dates[date_of_group] = 0
+        when 1
+          grouped_dates[Date.ordinal(data.first['_id']['year'], data.first['_id']['date'])] = data.first['total_scenarios']
+      end
+
+    end
+    grouped_dates.to_a
   end
 
   def get_total_regression_grouped(job, sortby, regression_tag)
@@ -116,6 +136,7 @@ class ResultsProcessor
 
   end
 
+  #TODO duplication of data all over this class, sort it out!!
   def get_grouped_tagged(job)
     results = DryRun.get_total_group_tags(job)
 
@@ -127,38 +148,51 @@ class ResultsProcessor
     values.to_a
   end
 
-  def get_total_scenarios_manual(job, sortby, regression_tag)
+  #TODO needs refector to DRY also write custom sort as this may break on date/month changes :-S
+  def get_total_scenarios_breakdown(job, sortby, regression_tag)
     total_scenarios = get_total_scenarios_ran_aggregated(job,sortby)
     total_manual = get_total_manual_grouped(job, sortby)
+    total_scenarios_failed = get_total_failed_grouped(job, sortby)
     total_regression = get_total_regression_grouped(job, sortby, regression_tag)
-
-    scenarios = {}
-    scenarios[:name] = 'Scenarios Automated'
-    scenarios[:data] = total_scenarios.sort.last(7)
 
     manual = {}
     manual[:name] = 'Scenarios Manual'
     manual[:data] = total_manual.sort.last(7)
 
+    scenarios_failed = {}
+    scenarios_failed[:name] = 'Scenarios Failed'
+    scenarios_failed[:data] = total_scenarios_failed.sort.last(7)
+
+
+    scenarios_less_failed_scenarios ={}
+    scenarios_less_failed_scenarios[:name] = 'Scenarios Passed'
+    pass_less_fail = {}
+    total_scenarios.to_h.each do |key, value|
+        pass_less_fail[key] = value - total_scenarios_failed.to_h[key]
+    end
+    scenarios_less_failed_scenarios[:data] = pass_less_fail.to_a.sort.last(7)
 
 
     total_regression_scenarios = {}
     total_regression_scenarios[:name] = 'Remaining'
     total_regression_scenarios[:data] = total_regression.sort.last(7)
 
+
     remaining_tests = {}
     total_regression_scenarios[:data].to_h.each do |key, value|
-      total_executable_tests =  total_scenarios.to_h[key] + total_manual.to_h[key]
+      total_executable_tests =  total_scenarios.to_h[key]+ total_manual.to_h[key]
       to_do = value - total_executable_tests
 
       remaining_tests[key] = to_do
     end
 
+
+
     total_regression_scenarios[:data] = remaining_tests.to_a
 
-
     stacked_data = []
-    stacked_data << scenarios
+    stacked_data << scenarios_less_failed_scenarios
+    stacked_data << scenarios_failed
     stacked_data << manual
     stacked_data << total_regression_scenarios
 

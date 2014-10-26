@@ -141,6 +141,20 @@ class TestRun
     day_count
   end
 
+  def self.get_failed_by_date(date, job)
+    start_timestamp = date
+    end_timestamp = date+1
+    day_count = self.collection.aggregate(
+        {'$match' => {job: job, created_at: {'$gte' => start_timestamp.mongoize, '$lt' => end_timestamp.mongoize}}},
+        {'$limit' => 1},
+        {'$unwind' => '$scenarios'},
+        {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
+        {'$match' => {'scenarios.steps.result.status' => 'failed'}},
+        {'$group' => {'_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => {'$sum' => 1}}}
+    )
+    day_count
+  end
+
 end
 
 
@@ -158,6 +172,17 @@ class DryRun
         {'$limit' => 1}
     )
 
+  end
+
+  def self.get_latest_total_scenarios(job, regression_tag)
+    self.collection.aggregate(
+        {'$match' => {job: job}},
+        {'$sort' => {created_at: 1}},
+        {'$limit' => 1},
+        {'$unwind' => '$scenarios'},
+        {'$match' => {'scenarios.tags.name' => regression_tag}},
+        {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
+    )
   end
 
   def self.get_total_manual_grouped(job, sortby)
@@ -201,6 +226,7 @@ class DryRun
     day_count
   end
 
+
   def self.get_total_manual_scenarios(job)
     self.collection.aggregate(
         {'$match' => {job: job}},
@@ -219,9 +245,8 @@ class DryRun
         {'$sort' => {created_at: 1}},
         {'$limit' => 1},
         {'$unwind' => '$scenarios'},
-        {'$project' => {'scenarios.tags' => 1}},
-        {'$unwind' => '$scenarios.tags'},
-        {'$group' => {'_id' => {'tag' => '$scenarios.tags.name'}, 'count' => {'$sum' => 1}}}
+        {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
+        {'$group' => {'_id' => {'tag' => '$scenarios'}, 'count' => {'$sum' => 1}}}
     )
   end
 

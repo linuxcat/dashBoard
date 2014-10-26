@@ -32,7 +32,7 @@
         </div>
 
         <div class="col-md-4 col-sm-3 placeholder">
-          <a href= "/test-projects/<%=@summary[:current_job]%>/detailed_view?sortby=day"> <%= bar_chart [["Total Acceptance Tests", @tag_groups.to_h[regression_tag]], ["Number Automated", @summary[:total_scenarios_in_run]    ], ["Total Manual", @summary[:total_manual_scenarios]    ]], colors: ["purple", "red"] %> </a>
+          <a href= "/test-projects/<%=@summary[:current_job]%>/detailed_view?sortby=day"> <%= bar_chart [["Total Acceptance Tests", @summary[:total_tests]], ["Number Automated", @summary[:total_scenarios_in_run]    ], ["Total Manual", @summary[:total_manual_scenarios]    ]], colors: ["purple", "red"] %> </a>
           <h4>Total Scenarios / Automated Scenarios</h4>
           <span class="text-muted">Total Scenarios Breakdown></span>
         </div>
