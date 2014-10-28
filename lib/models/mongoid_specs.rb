@@ -246,7 +246,8 @@ class DryRun
         {'$limit' => 1},
         {'$unwind' => '$scenarios'},
         {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
-        {'$group' => {'_id' => {'tag' => '$scenarios'}, 'count' => {'$sum' => 1}}}
+        {'$unwind' => '$scenarios.tags' },
+        {'$group' => { '_id' => {'tag' => '$scenarios.tags.name'}, count: {'$sum' => 1} } }
     )
   end
 

@@ -19,9 +19,9 @@ puts data.inspect
 
 rp = ResultsProcessor.new('Sun - Firefox Tests - Regression')
 
-results = rp.get_pass_percentage('Sun - Chrome Tests - Regression', 'day')
+results = rp.get_grouped_tagged('Sun - Chrome Tests - Regression')
 
-puts results
-h = (results.sort_by { |k, v|}.last 7).to_h
+results.each do |result|
+  puts result
+end
 
-puts h.inspect

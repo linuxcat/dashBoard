@@ -139,7 +139,7 @@ class ResultsProcessor
   #TODO duplication of data all over this class, sort it out!!
   def get_grouped_tagged(job)
     results = DryRun.get_total_group_tags(job)
-
+    puts results.inspect
     values ={}
     results.each do |outer_hash|
       values[outer_hash['_id']["tag"]] = outer_hash['count']
@@ -180,7 +180,7 @@ class ResultsProcessor
 
     remaining_tests = {}
     total_regression_scenarios[:data].to_h.each do |key, value|
-      total_executable_tests =  total_scenarios.to_h[key]+ total_manual.to_h[key]
+      total_executable_tests =  total_scenarios.to_h[key] + total_manual.to_h[key]
       to_do = value - total_executable_tests
 
       remaining_tests[key] = to_do
