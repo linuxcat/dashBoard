@@ -177,7 +177,7 @@ class DryRun
   def self.get_latest_total_scenarios(job, regression_tag)
     self.collection.aggregate(
         {'$match' => {job: job}},
-        {'$sort' => {created_at: 1}},
+        {'$sort' => {created_at: -1}},
         {'$limit' => 1},
         {'$unwind' => '$scenarios'},
         {'$match' => {'scenarios.tags.name' => regression_tag}},
