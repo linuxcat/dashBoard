@@ -133,6 +133,7 @@ class TestRun
     end_timestamp = date+1
     day_count = self.collection.aggregate(
         {'$match' => {job: job, created_at: {'$gte' => start_timestamp.mongoize, '$lt' => end_timestamp.mongoize}}},
+        {'$sort' => {created_at: -1}},
         {'$limit' => 1},
         {'$unwind' => '$scenarios'},
         {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
@@ -146,6 +147,7 @@ class TestRun
     end_timestamp = date+1
     day_count = self.collection.aggregate(
         {'$match' => {job: job, created_at: {'$gte' => start_timestamp.mongoize, '$lt' => end_timestamp.mongoize}}},
+        {'$sort' => {created_at: -1}},
         {'$limit' => 1},
         {'$unwind' => '$scenarios'},
         {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
