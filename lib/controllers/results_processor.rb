@@ -11,6 +11,12 @@ class ResultsProcessor
     @end_day = 365
   end
 
+  def menu_items
+    summary = {}
+    summary[:menu_items] = TestRun.distinct("job")
+    summary
+  end
+
   #TODO all data should come from results processor not directly from the model.
   def get_summary_data(job, regression_tag)
     summary = {}

@@ -13,7 +13,28 @@ module Sinatra
     end
 
     def regression_tag
-      environment['regression_tag']
+      environment['tags']['regression_tag']
+    end
+
+    def ios_tag
+      environment['tags']['ios']
+    end
+
+    def android_tag
+      environment['tags']['android']
+    end
+
+
+    def get_project_tag(project)
+      if project.downcase.include?('ios')
+        regression_tag = ios_tag
+      elsif project.downcase.include?('android')
+        regression_tag = android_tag
+      else
+        regression_tag = self.regression_tag
+      end
+
+      regression_tag
     end
 
 
@@ -29,4 +50,7 @@ module Sinatra
   helpers EnvironmentConstantHelper
 
 end
+
+
+
 

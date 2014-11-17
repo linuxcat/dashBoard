@@ -27,6 +27,7 @@ class TestProjects < AppBase
   end
 
   get '/:id/summary' do
+    regression_tag = get_project_tag(params[:id])
     rp = ResultsProcessor.new(params[:id])
     @tag_groups = rp.get_grouped_tagged(params[:id])
     @summary = rp.get_summary_data(params[:id],regression_tag)
@@ -35,6 +36,8 @@ class TestProjects < AppBase
   end
 
   get '/:id/detailed_view' do
+
+    regression_tag = get_project_tag(params[:id])
     rp = ResultsProcessor.new(params[:id])
     @total_scenarios = rp.get_total_scenarios_breakdown(params[:id], params[:sortby], regression_tag)
     @summary = rp.get_summary_data(params[:id],regression_tag)

@@ -1,9 +1,20 @@
 sun_web_team:
   tag_project: 'Sun - Firefox Tests - Regression'
-  regression_tag: '@regression'
+  tags:
+    regression_tag: '@regression'
 times_web_team:
-  tag_project: ''
-  regression_tag:
+  tag_project: 'Sun - Firefox Tests - Regression'
+  tags:
+    regression_tag: '@regression'
 app_team:
   tag_project: 'iOS_7_Ipad_Regression_build_nightly'
-  regression_tag: '@ios'
+  tags:
+    ios: '@ios'
+    android: '@android7'
+
+
+
+
+
+
+
