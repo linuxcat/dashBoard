@@ -137,6 +137,7 @@ class TestRun
         {'$limit' => 1},
         {'$unwind' => '$scenarios'},
         {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
+        {'$match' => {'scenarios.steps.result.status'  => {'$ne' =>'undefined'}}},
         {'$group' => {'_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => {'$sum' => 1}}}
     )
     day_count
