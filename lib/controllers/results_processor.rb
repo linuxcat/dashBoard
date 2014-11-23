@@ -55,19 +55,6 @@ class ResultsProcessor
     (final_data.sort_by { |k, v|}.last 7).to_h
   end
 
-  #TODO Refector to DRY
-  def get_total_scenarios_grouped(job, sortby)
-    total_scenarios = TestRun.get_total_scenarios_grouped(job, sortby)
-    sorted_data = {}
-    total_scenarios.each do |hash|
-      date_of_group = day_calculation(sortby, hash).to_s
-      sorted_data[date_of_group] = hash['total_scenarios']
-
-    end
-
-    sorted_data.to_a
-  end
-
   def get_grouped(job, sortby,group_type, opts={})
     collection = Object.const_get(get_class_name(group_type))
     dates = TestRun.get_dates_for_test_runs(job,sortby)
@@ -91,11 +78,8 @@ class ResultsProcessor
     grouped_dates.to_a
   end
 
-
-  #TODO duplication of data all over this class, sort it out!!
   def get_grouped_tagged(job)
     results = DryRun.get_total_group_tags(job)
-    puts results.inspect
     values ={}
     results.each do |outer_hash|
       values[outer_hash['_id']["tag"]] = outer_hash['count']
