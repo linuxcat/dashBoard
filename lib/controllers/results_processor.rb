@@ -23,7 +23,7 @@ class ResultsProcessor
     summary[:menu_items] = TestRun.distinct("job")
     summary[:status_summary] = prepare_pass_fail_hash(job)
     summary[:failures] = get_failure_count(job)
-    summary[:total_scenarios_grouped_by_day] = get_total_scenarios_ran_aggregated(job, 'day').sort
+    summary[:total_scenarios_grouped_by_day] = get_grouped(job, 'day', 'all_scenarios_ran').sort
     summary[:total_tests] = DryRun.get_latest_total_scenarios(job, regression_tag).count
     summary[:current_job] = @job
     summary[:total_scenarios_in_run] =  TestRun.total_scenarios_in_run(job).first['count']
@@ -68,79 +68,29 @@ class ResultsProcessor
     sorted_data.to_a
   end
 
-  #TODO Refector to DRY
-  def get_total_manual_grouped(job, sortby)
+  def get_grouped(job, sortby,group_type, opts={})
+    collection = Object.const_get(get_class_name(group_type))
     dates = TestRun.get_dates_for_test_runs(job,sortby)
     grouped_dates = {}
     dates.each do |date|
       date_of_group = day_calculation(sortby, date)
-      data = DryRun.get_manual_by_date(date_of_group, job)
+      case !opts[:regression_tag].nil?
+        when true
+          data = collection.send("get_#{group_type}_by_date".to_sym, date_of_group, job, opts[:regression_tag])
+        when false
+          data = collection.send("get_#{group_type}_by_date".to_sym, date_of_group, job)
+      end
+
       case data.size
         when 0
           grouped_dates[date_of_group] = 0
         when 1
           grouped_dates[Date.ordinal(data.first['_id']['year'], data.first['_id']['date'])] = data.first['total_scenarios']
       end
-
-    end
-    grouped_dates.to_a
-
-  end
-
-  #TODO Refector to DRY
-  def get_total_failed_grouped(job, sortby)
-    dates = TestRun.get_dates_for_test_runs(job,sortby)
-    grouped_dates = {}
-    dates.each do |date|
-      date_of_group = day_calculation(sortby, date)
-      data = TestRun.get_failed_by_date(date_of_group, job)
-      case data.size
-        when 0
-          grouped_dates[date_of_group] = 0
-        when 1
-          grouped_dates[Date.ordinal(data.first['_id']['year'], data.first['_id']['date'])] = data.first['total_scenarios']
-      end
-
     end
     grouped_dates.to_a
   end
 
-  def get_total_regression_grouped(job, sortby, regression_tag)
-    dates = TestRun.get_dates_for_test_runs(job,sortby)
-    grouped_dates = {}
-    dates.each do |date|
-      date_of_group = day_calculation(sortby, date)
-      data = DryRun.get_regression_by_date(date_of_group, job, regression_tag)
-      case data.size
-        when 0
-          grouped_dates[date_of_group] = 0
-        when 1
-          grouped_dates[Date.ordinal(data.first['_id']['year'], data.first['_id']['date'])] = data.first['total_scenarios']
-      end
-
-    end
-    grouped_dates.to_a
-
-  end
-
-  def get_total_scenarios_ran_aggregated(job, sortby)
-    dates = TestRun.get_dates_for_test_runs(job,sortby)
-    grouped_dates = {}
-    dates.each do |date|
-      date_of_group = day_calculation(sortby, date)
-      data = TestRun.get_scenarios_ran_by_date(date_of_group, job)
-      case data.size
-        when 0
-          grouped_dates[date_of_group] = 0
-        when 1
-          grouped_dates[Date.ordinal(data.first['_id']['year'], data.first['_id']['date'])] = data.first['total_scenarios']
-      end
-
-    end
-    grouped_dates.to_a
-
-
-  end
 
   #TODO duplication of data all over this class, sort it out!!
   def get_grouped_tagged(job)
@@ -156,10 +106,10 @@ class ResultsProcessor
 
   #TODO needs refector to DRY also write custom sort as this may break on date/month changes :-S
   def get_total_scenarios_breakdown(job, sortby, regression_tag)
-    total_scenarios = get_total_scenarios_ran_aggregated(job,sortby)
-    total_manual = get_total_manual_grouped(job, sortby)
-    total_scenarios_failed = get_total_failed_grouped(job, sortby)
-    total_regression = get_total_regression_grouped(job, sortby, regression_tag)
+    total_scenarios = get_grouped(job,sortby, 'all_scenarios_ran')
+    total_manual = get_grouped(job, sortby, 'manual')
+    total_scenarios_failed = get_grouped(job, sortby, 'failed')
+    total_regression = get_grouped(job, sortby,'regression', :regression_tag => regression_tag)
 
     manual = {}
     manual[:name] = 'Scenarios Manual'
@@ -203,8 +153,6 @@ class ResultsProcessor
     stacked_data << total_regression_scenarios
 
     stacked_data
-
-
   end
 
 
@@ -271,6 +219,19 @@ private
         day = Date.new(element['_id']['year'], element['_id']['date'], 1).yday
     end
     Date.ordinal(element['_id']['year'], day)
+  end
+
+  def get_class_name(data_attribute)
+    case data_attribute
+      when 'failed'
+        'TestRun'
+      when 'all_scenarios_ran'
+        'TestRun'
+      when 'manual'
+        'DryRun'
+      when 'regression'
+        'DryRun'
+    end
   end
 
 

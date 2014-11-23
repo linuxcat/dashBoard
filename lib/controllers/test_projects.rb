@@ -42,7 +42,7 @@ class TestProjects < AppBase
     @total_scenarios = rp.get_total_scenarios_breakdown(params[:id], params[:sortby], regression_tag)
     @summary = rp.get_summary_data(params[:id],regression_tag)
     @pass_percentage = rp.get_pass_percentage(params[:id], params[:sortby])
-    @total_manual = rp.get_total_manual_grouped(params[:id], params[:sortby])
+    @total_manual = rp.get_grouped(params[:id], params[:sortby], 'manual')
     erb :detailed
   end
 
