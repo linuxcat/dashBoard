@@ -143,24 +143,6 @@ class ResultsProcessor
 
 
 private
-  def get_column_chart_data_total_scenarios(job)
-    graph_data = {}
-
-    results = TestRun.where(job: job ,:created_at.gte => (Date.today - @end_day)).asc(:created_at)
-    results.each do |job|
-      date = Date.parse(job.created_at.to_s)
-      day = date.strftime("%b")
-      month = date.strftime("%e")
-      graph_data["#{day} #{month}"] = job.scenarios.count
-
-    end
-    graph_data.to_a
-  end
-
-  def get_dry_run_total_scenarios(job)
-    total_tests = DryRun.return_latest_dry_run(job)
-    total_tests.first['scenarios'].count
-  end
 
 
   def prepare_pass_fail_hash(job)
@@ -190,8 +172,6 @@ private
     end
     failure_summary
   end
-
-
 
   def day_calculation(sortby, element)
     case sortby
