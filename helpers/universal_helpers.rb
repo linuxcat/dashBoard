@@ -27,9 +27,9 @@ module Sinatra
 
     def get_project_tag(project)
       if project.downcase.include?('ios')
-        regression_tag = ios_tag
+        regression_tag = self.ios_tag
       elsif project.downcase.include?('android')
-        regression_tag = android_tag
+        regression_tag = self.android_tag
       else
         regression_tag = self.regression_tag
       end
