@@ -42,7 +42,9 @@ module Sinatra
 
     def environment
       environment = YAML::load_file(File.join(File.dirname(File.expand_path(__FILE__)), '../config/test_projects.yml'))
-      @selected_environment = environment[ENV['TEST_PROJECT']]
+#      @selected_environment = environment[ENV['TEST_PROJECT']]
+      @selected_environment = environment['sun_web_team']
+
     end
 
   end
@@ -50,6 +52,12 @@ module Sinatra
   helpers EnvironmentConstantHelper
 
 end
+
+include Sinatra::EnvironmentConstantHelper
+
+puts android_tag
+
+
 
 
 

@@ -16,12 +16,20 @@ rp = ResultsProcessor.new('Sun - Chrome Tests - Regression')
 data = rp.get_total_manual_grouped_two('Sun - Chrome Tests - Regression','week')
 puts data.inspect
 =end
+=begin
+total_test = DryRun.get_latest_total_scenarios('Sun - Firefox Tests - Regression', '@regression').count
 
-rp = ResultsProcessor.new('Sun - Firefox Tests - Regression')
+day = Date.ordinal(2014,295)
 
-results = rp.get_grouped_tagged('Sun - Chrome Tests - Regression')
+puts day
 
-results.each do |result|
-  puts result
-end
+total_test_day = DryRun.get_regression_by_date(day, 'Sun - Firefox Tests - Regression', '@regression')
 
+puts total_test
+puts total_test_day.inspect
+=end
+
+opts={:regression_tag => '@regression'}
+
+
+puts !opts[:regression_tag].nil?
