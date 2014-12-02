@@ -27,7 +27,7 @@ class ResultsProcessor
     summary[:total_tests] = DryRun.get_latest_total_scenarios(job, regression_tag).count
     summary[:current_job] = @job
     summary[:total_scenarios_in_run] =  TestRun.total_scenarios_in_run(job).first['count']
-    summary[:total_manual_scenarios] = get_total_manual_tests(job)['count']
+    summary[:total_manual_scenarios] = get_total_manual_tests(job).first['count']
     summary
   end
 
@@ -122,7 +122,7 @@ class ResultsProcessor
     total_regression_scenarios[:data].to_h.each do |key, value|
 
       total_executable_tests =  total_scenarios.to_h[key] + total_manual.to_h[key]
-      to_do = total_executable_tests - value
+      to_do =  value - total_executable_tests
       remaining_tests[key] = to_do
     end
 
@@ -202,8 +202,10 @@ private
   def get_total_manual_tests(job)
     @total_manual = DryRun.get_total_manual_scenarios(job)
     if @total_manual.first.nil?
-      @total_manual = { '_id' => 'null'}
-      @total_manual = { 'count' => 0 }
+      total_manual_hash = Hash.new
+      total_manual_hash['_id'] = 'null'
+      total_manual_hash['count'] = 0
+      @total_manual << total_manual_hash
     end
     @total_manual
 
