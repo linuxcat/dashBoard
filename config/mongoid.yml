@@ -6,3 +6,4 @@ development:
         - localhost:27017
       options:
         consistency: strong
+        allowDiskUse: true
