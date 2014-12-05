@@ -190,7 +190,6 @@ class DryRun
           {'$unwind' => '$scenarios'},
           {'$match' => {'scenarios.tags.name' => regression_tag}},
           {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
-          {'allowDiskUse' => true}
       )
     end
 
@@ -203,7 +202,6 @@ class DryRun
           {'$match' => {'scenarios.tags.name' => '@manual'}},
           {'$project' => {'scenarios.tags.name' => 1, 'created_at' => 1}},
           {'$group' => {'_id' => {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => {'$sum' => 1}}},
-          {'allowDiskUse' => true}
       )
 
       scenarios
@@ -218,7 +216,6 @@ class DryRun
           {'$unwind' => '$scenarios'},
           {'$match' => {'scenarios.tags.name' => '@manual'}},
           {'$group' => {'_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => {'$sum' => 1}}},
-          {'allowDiskUse' => true}
       )
       day_count
     end
@@ -233,7 +230,6 @@ class DryRun
           {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
           {'$match' => {'scenarios.tags.name' => regression_tag}},
           {'$group' => {'_id' => {'date' => {'$dayOfYear' => '$created_at'}, 'year' => {'$year' => '$created_at'}}, 'total_scenarios' => {'$sum' => 1}}},
-          {'allowDiskUse' => true}
       )
       day_count
     end
@@ -248,7 +244,6 @@ class DryRun
           {'$project' => {'scenarios.tags' => 1}},
           {'$match' => {'scenarios.tags.name' => '@manual'}},
           {'$group' => {'_id' => 'null', count: {'$sum' => 1}}},
-          {'allowDiskUse' => true}
       )
     end
 
@@ -261,7 +256,6 @@ class DryRun
           {'$match' => {'scenarios.type' => {'$ne' => 'background'}}},
           {'$unwind' => '$scenarios.tags'},
           {'$group' => {'_id' => {'tag' => '$scenarios.tags.name'}, count: {'$sum' => 1}}},
-          {'allowDiskUse' => true}
       )
     end
   end
@@ -283,7 +277,6 @@ class TestRunFailure
           {'$match' => {test_run: job}},
           {'$group' => {_id: {failure: "$failed._id.feature"}, count: {'$sum' => 1}, last_failure: {'$max' => "$created_at"}}},
           {'$sort' => {last_failure: -1}},
-          {'allowDiskUse' => true}
 
       )
       grouped
@@ -295,7 +288,6 @@ class TestRunFailure
           {'$match' => {test_run: job}},
           {'$match' => {'failed._id.feature' => feature}},
           {'$group' => {_id: {status: '$failed._id.feature'}, last_failed: {'$max' => '$created_at'}}},
-          {'allowDiskUse' => true}
       )
       last_failed
 
