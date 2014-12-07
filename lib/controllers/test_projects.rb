@@ -51,6 +51,15 @@ class TestProjects < AppBase
     erb :tag_report
   end
 
+  get '/:id/failed-scenarios/:scenario' do
+    puts params[:scenario]
+    rp = ResultsProcessor.new(params[:id])
+    scenario = rp.get_failed_scenario(params[:id], params[:scenario])
+    json scenario
+
+  end
+
+
 
 
 

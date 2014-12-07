@@ -308,6 +308,18 @@ class TestRunFailure
       last_failed
 
     end
+
+
+    def get_scenario_failed(job, feature)
+      self.collection.aggregate(
+          [{'$match' => {test_run:job}},
+          {'$unwind' => '$failed'},
+          {'$match' =>{ 'failed._id.feature' => feature}},
+          {'$limit' => 1},
+          {'$sort' => {created_at: -1}}
+          ]
+      )
+    end
   end
 
 end

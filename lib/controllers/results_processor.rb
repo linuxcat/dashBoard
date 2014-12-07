@@ -142,6 +142,10 @@ class ResultsProcessor
   end
 
 
+  def get_failed_scenario(job, feature)
+    failed_scenario = TestRunFailure.get_scenario_failed(job, feature)
+    failed_scenario
+  end
 
 
 private
