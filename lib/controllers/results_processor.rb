@@ -95,6 +95,8 @@ class ResultsProcessor
     total_scenarios_failed = get_grouped(job, sortby, 'failed')
     total_regression = get_grouped(job, sortby,'regression', :regression_tag => regression_tag)
 
+
+
     manual = {}
     manual[:name] = 'Scenarios Manual'
     manual[:data] = total_manual.sort.last(7)

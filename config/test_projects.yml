@@ -2,7 +2,7 @@ sun_web_team:
   tag_project: 'Sun - Firefox Tests - Regression'
   tags:
     regression_tag: '@regression'
-    ios: '@device_regression'
+    ios: '@device_re  gression'
     android: '@device_regression'
 times_web_team:
   tag_project: 'Sun - Firefox Tests - Regression'
