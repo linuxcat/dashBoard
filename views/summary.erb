@@ -54,7 +54,7 @@
           <tbody>
           <% @summary[:failures].each do |key, value| %>
               <tr>
-                <td><%= key %></td>
+                <td><a href="/test-projects/<%=@summary[:current_job]%>/failed-scenarios/<%= key %>" target="_blank"><%= key %></a></td>
                 <td><%= value['last_failed_date'] %></td>
                 <td><%= value['failure_count'] %></td>
 
