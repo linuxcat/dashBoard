@@ -26,7 +26,7 @@ class ResultsProcessor
     summary[:total_scenarios_grouped_by_day] = get_grouped(job, 'day', 'all_scenarios_ran').sort
     summary[:total_tests] = DryRun.get_latest_total_scenarios(job, regression_tag).count
     summary[:current_job] = @job
-    summary[:total_scenarios_in_run] =  TestRun.total_scenarios_in_run(job).first['count']
+    summary[:total_scenarios_in_run] =  get_total_executed_tests(job).first['count']
     summary[:total_manual_scenarios] = get_total_manual_tests(job).first['count']
     summary
   end
@@ -201,6 +201,19 @@ private
       when 'regression'
         'DryRun'
     end
+  end
+
+
+  def get_total_executed_tests(job)
+    @total = TestRun.total_scenarios_in_run(job)
+    if @total.first.nil?
+      total_manual_hash = Hash.new
+      total_manual_hash['_id'] = 'null'
+      total_manual_hash['count'] = 0
+      @total << total_manual_hash
+    end
+    @total
+
   end
 
 
