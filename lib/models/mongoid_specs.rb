@@ -11,6 +11,7 @@ end
 class TestRun
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Attributes::Dynamic
 
   field :job, type: String
   field :scenarios, type: Array
@@ -183,6 +184,8 @@ end
 class DryRun
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Attributes::Dynamic
+
 
   field :job, type: String
   field :scenarios, type: Array
@@ -282,6 +285,8 @@ end
 class TestRunFailure
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Attributes::Dynamic
+
 
   field :test_run, type: String
   field :failure, type: Array
