@@ -100,7 +100,9 @@ class TestRun
           {'$project' => {'scenarios.steps.result.status' => 1, created_at: 1, '_id' => 0}},
           {'$unwind' => '$scenarios.steps'},
           {'$project' => {'scenarios.steps' => 1, created_at: 1, '_id' => 0}},
-          {'$group' => {_id: {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}, total_tests: {'$sum' => 1}}}]
+          {'$group' => {_id: {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}, total_tests: {'$sum' => 1}}}],
+          {'allowDiskUse' => true}
+
       )
       percentage_pass[:total_passed] = self.collection.aggregate(
          [ {'$match' => {job: job}},
@@ -109,7 +111,9 @@ class TestRun
           {'$project' => {'scenarios.steps.result.status' => 1, created_at: 1, '_id' => 0}},
           {'$unwind' => '$scenarios.steps'},
           {'$match' => {'scenarios.steps.result.status' => 'passed'}},
-          {'$group' => {_id: {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}, total_passed: {'$sum' => 1}}}]
+          {'$group' => {_id: {'date' => {sort => '$created_at'}, 'year' => {'$year' => '$created_at'}}, total_passed: {'$sum' => 1}}}],
+         {'allowDiskUse' => true}
+
       )
       return percentage_pass
     end
