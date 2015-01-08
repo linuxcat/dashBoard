@@ -187,7 +187,12 @@ private
       when 'month'
         day = Date.new(element['_id']['year'], element['_id']['date'], 1).yday
     end
-    Date.ordinal(element['_id']['year'], day)
+    calculated_day = day
+
+    if day == 0
+      calculated_day = 1
+    end
+    Date.ordinal(element['_id']['year'], calculated_day)
   end
 
   def get_class_name(data_attribute)
